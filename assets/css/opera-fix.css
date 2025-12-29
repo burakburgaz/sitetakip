@@ -1,0 +1,258 @@
+/* assets/css/opera-fix.css - Opera Browser Compatibility Fixes */
+
+/* ============================================
+   OPERA BROWSER SPECIFIC FIXES
+   ============================================ */
+
+/* Fix for Opera's flexbox implementation */
+@supports (-o-transform: translate(-50%, -50%)) {
+    
+    /* Ensure proper flex behavior in Opera */
+    .flex,
+    .flex-1,
+    .flex-col {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -o-flex;
+        display: flex;
+    }
+    
+    .flex-1 {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -o-flex: 1;
+        flex: 1;
+    }
+    
+    /* Fix table rendering in Opera */
+    table.sites-table {
+        border-collapse: separate !important;
+        border-spacing: 0 8px !important;
+        table-layout: fixed;
+        width: 100%;
+    }
+    
+    table.sites-table tbody tr {
+        display: table-row;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Fix transform issues in Opera */
+    table.sites-table tbody tr:hover {
+        -o-transform: translateY(-1px);
+        -webkit-transform: translateY(-1px);
+        transform: translateY(-1px);
+    }
+    
+    /* Ensure proper gradient rendering */
+    .package-pro {
+        background: #fbbf24;
+        background: -o-linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+    
+    .package-basic {
+        background: #60a5fa;
+        background: -o-linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    }
+    
+    /* Fix border-radius rendering */
+    .rounded,
+    .rounded-lg,
+    .rounded-xl {
+        -webkit-border-radius: inherit;
+        -o-border-radius: inherit;
+        border-radius: inherit;
+    }
+    
+    /* Fix box-shadow rendering */
+    .shadow,
+    .shadow-sm,
+    .shadow-lg {
+        -webkit-box-shadow: inherit;
+        -o-box-shadow: inherit;
+        box-shadow: inherit;
+    }
+}
+
+/* General Opera fixes (not dependent on @supports) */
+
+/* Fix sticky positioning in Opera */
+.sticky,
+[class*="sticky"] {
+    position: -webkit-sticky;
+    position: -o-sticky;
+    position: sticky;
+}
+
+/* Fix grid display */
+.grid {
+    display: -ms-grid;
+    display: grid;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix backdrop-filter for Opera */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+/* Ensure proper text rendering in Opera */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizelegibility;
+}
+
+/* Fix overflow handling in Opera */
+.overflow-auto,
+.overflow-x-auto,
+.overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix button alignment in Opera */
+button,
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+}
+
+/* Fix select dropdown in Opera */
+select {
+    -webkit-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+}
+
+/* Fix table cell alignment in Opera */
+table td,
+table th {
+    vertical-align: middle;
+}
+
+/* Ensure proper z-index stacking in Opera */
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-50 { z-index: 50; }
+.z-999 { z-index: 999; }
+.z-1000 { z-index: 1000; }
+
+/* Fix animation timing in Opera */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        -o-transform: translateY(10px);
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        -o-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        -o-transform: scale(0.95);
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        -o-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+/* Fix table spacing in Opera specifically */
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
+    table.sites-table {
+        border-spacing: 0 8px;
+    }
+    
+    table.sites-table tbody tr {
+        margin-bottom: 8px;
+    }
+}
+
+/* Additional Opera-specific table fixes */
+@-o-viewport {
+    width: device-width;
+}
+
+/* Ensure proper width calculation in Opera */
+* {
+    -webkit-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* Fix flexbox gap in older Opera versions */
+.gap-2 > * + * { margin-left: 0.5rem; }
+.gap-3 > * + * { margin-left: 0.75rem; }
+.gap-4 > * + * { margin-left: 1rem; }
+
+/* Fix for Opera's specific flex issues with tables */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+/* Ensure proper rendering of cards in Opera */
+.card-hover {
+    will-change: transform, box-shadow;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* Fix modal positioning in Opera */
+.modal-backdrop > div {
+    position: relative;
+    margin: auto;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+/* Ensure proper line-height in Opera */
+body,
+button,
+input,
+select,
+textarea {
+    line-height: 1.5;
+}
+
+/* Fix potential text overflow issues in Opera */
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Ensure proper transition timing in Opera */
+.transition,
+.transition-all {
+    -o-transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}

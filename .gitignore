@@ -1,0 +1,6 @@
+database.sqlite
+logs/
+cache/
+*.log
+.DS_Store
+Thumbs.db

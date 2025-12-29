@@ -1,0 +1,26 @@
+/* ZORLA GÖRÜNÜR YAP! */
+.tab-content {
+    display: none !important;
+}
+
+.tab-content.active {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    min-height: 400px;
+}
+
+#googlesheets-tab,
+#backup-tab {
+    display: none;
+}
+
+#googlesheets-tab.active,
+#backup-tab.active {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100% !important;
+    min-height: 400px !important;
+}
