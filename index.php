@@ -336,7 +336,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="h-full">
 
 <head>
     <meta charset="UTF-8">
@@ -345,72 +345,201 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Inter', sans-serif;
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        .bg-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 51, 234, 0.2) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 { top: -100px; left: -100px; animation-delay: 0s; }
+        .blob-2 { bottom: -100px; right: -100px; animation-delay: -5s; background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(34, 197, 94, 0.2) 100%); }
+        .blob-3 { top: 40%; left: 60%; animation-delay: -10s; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%); }
+
+        @keyframes move {
+            from { transform: translate(0, 0) rotate(0deg) scale(1); }
+            to { transform: translate(100px, 50px) rotate(90deg) scale(1.1); }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            outline: none;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-gradient:active {
+            transform: translateY(0);
+        }
+
+        .logo-font {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .animate-up {
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+
+        /* Custom Scrollbar for modern feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-2xl mb-4">
-                <i class="fa-solid fa-globe text-indigo-600 text-4xl"></i>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="w-full max-w-[440px] animate-up">
+        <div class="text-center mb-10">
+            <div class="relative inline-flex mb-6 stagger-1 opacity-0 animate-up" style="animation-fill-mode: forwards;">
+                <div class="absolute inset-0 bg-blue-500 blur-2xl opacity-20 animate-pulse"></div>
+                <div class="relative flex items-center justify-center w-20 h-20 glass-card rounded-3xl rotate-12 hover:rotate-0 transition-transform duration-500">
+                    <i class="fa-solid fa-rocket text-blue-400 text-4xl"></i>
+                </div>
             </div>
-            <h1 class="text-4xl font-bold text-white mb-2">DReklam</h1>
-            <p class="text-lg text-indigo-100 font-medium">Site Takip Yönetimi</p>
+            <h1 class="text-5xl font-bold logo-font text-white mb-3 stagger-2 opacity-0 animate-up" style="animation-fill-mode: forwards;">
+                DReklam
+            </h1>
+            <p class="text-blue-200/60 font-medium tracking-widest uppercase text-xs stagger-3 opacity-0 animate-up" style="animation-fill-mode: forwards;">
+                Site Takip Yönetimi
+            </p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <div class="glass-card rounded-[2.5rem] p-10 stagger-3 opacity-0 animate-up shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]" style="animation-fill-mode: forwards;">
             <?php if ($error): ?>
-                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded flex items-center gap-2">
-                    <i class="fa-solid fa-exclamation-circle"></i> <span><?= htmlspecialchars($error) ?></span>
+                <div class="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 text-sm">
+                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                    <span><?= htmlspecialchars($error) ?></span>
                 </div>
             <?php endif; ?>
+
             <?php if ($success): ?>
-                <div
-                    class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded flex items-center gap-2">
-                    <i class="fa-solid fa-check-circle"></i> <span><?= htmlspecialchars($success) ?></span>
+                <div class="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center gap-3 text-sm">
+                    <i class="fa-solid fa-circle-check text-lg"></i>
+                    <span><?= htmlspecialchars($success) ?></span>
                 </div>
             <?php endif; ?>
 
             <?php if ($show_2fa): ?>
-                <form method="POST" action="" class="space-y-6">
-                    <div class="text-center mb-4">
-                        <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                            <i class="fa-brands fa-whatsapp text-green-600 text-xl"></i>
+                <form method="POST" action="" class="space-y-8">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-500/10 rounded-2xl mb-4 border border-emerald-500/20">
+                            <i class="fa-brands fa-whatsapp text-emerald-400 text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800">Doğrulama Kodu</h3>
-                        <p class="text-sm text-gray-600">
-                            <strong><?= $masked_phone ?></strong> numaralı WhatsApp ve kayıtlı E-posta adresinize gönderilen
-                            kodu giriniz.
+                        <h3 class="text-xl font-bold text-white mb-2">Güvenlik Doğrulaması</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed px-4">
+                            <span class="text-emerald-400 font-semibold"><?= $masked_phone ?></span> numaralı WhatsApp ve kayıtlı E-posta adresinize gönderilen 6 haneli kodu giriniz.
                         </p>
                     </div>
 
-                    <div>
+                    <div class="relative">
                         <input type="text" name="2fa_code" required autofocus autocomplete="off"
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-center text-xl tracking-widest"
-                            placeholder="******" maxlength="6">
+                            class="w-full px-6 py-5 input-glass rounded-2xl text-center text-3xl tracking-[0.5em] font-bold placeholder:text-slate-700"
+                            placeholder="000000" maxlength="6">
+                        <div class="absolute -bottom-6 left-0 right-0 text-center">
+                             <div id="countdown" class="text-[10px] text-slate-500 uppercase tracking-widest">Yeni kod için bekleyin: <span id="timer" class="text-slate-300">60</span>s</div>
+                        </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:from-green-700 hover:to-teal-700 transform hover:scale-105 transition shadow-lg">
-                        <i class="fa-solid fa-check-circle mr-2"></i>Doğrula
-                    </button>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full btn-gradient text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 group">
+                            <span>Sisteme Giriş Yap</span>
+                            <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
 
-                    <div class="text-center mt-4 space-y-2">
-                        <div id="countdown" class="text-xs text-gray-400">Tekrar gönder: <span id="timer">60</span> sn</div>
+                    <div class="flex flex-col items-center gap-4 pt-2">
                         <a href="?action=resend_2fa" id="resendBtn"
-                            class="hidden text-sm text-green-600 hover:text-green-800 font-semibold underline">
-                            <i class="fa-solid fa-sync mr-1"></i>Kodu Tekrar Gönder
+                            class="hidden text-sm text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span>Kodu Tekrar Gönder</span>
                         </a>
-                    </div>
-
-                    <div class="text-center mt-2 border-t pt-3">
-                        <a href="?action=cancel_2fa" class="text-xs text-gray-500 hover:text-gray-700">Farklı hesaba geç /
-                            İptal</a>
+                        <a href="?action=cancel_2fa" class="text-xs text-slate-500 hover:text-slate-300 transition-colors border-b border-transparent hover:border-slate-700 pb-0.5">
+                            Farklı hesapla giriş yap
+                        </a>
                     </div>
                 </form>
                 <script>
@@ -427,32 +556,49 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
                 </script>
             <?php else: ?>
                 <form method="POST" action="" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fa-solid fa-user text-indigo-600 mr-2"></i>Kullanıcı Adı
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
+                            Kullanıcı Adı
                         </label>
-                        <input type="text" name="username" required autofocus
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition"
-                            placeholder="Kullanıcı adınızı girin">
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-user text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                            </div>
+                            <input type="text" name="username" required autofocus
+                                class="w-full pl-12 pr-6 py-4 input-glass rounded-2xl transition-all"
+                                placeholder="kullanıcı_adi">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fa-solid fa-lock text-indigo-600 mr-2"></i>Şifre
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
+                            Şifre
                         </label>
-                        <input type="password" name="password" required
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition"
-                            placeholder="Şifrenizi girin">
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-shield-halved text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                            </div>
+                            <input type="password" name="password" required
+                                class="w-full pl-12 pr-6 py-4 input-glass rounded-2xl transition-all"
+                                placeholder="••••••••">
+                        </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition shadow-lg">
-                        <i class="fa-solid fa-sign-in-alt mr-2"></i>Giriş Yap
-                    </button>
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full btn-gradient text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 group">
+                            <span>Oturum Aç</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
                 </form>
             <?php endif; ?>
-
-            <!-- Footer Removed -->
+        </div>
+        
+        <div class="mt-8 text-center stagger-3 opacity-0 animate-up" style="animation-fill-mode: forwards; animation-delay: 0.5s;">
+            <p class="text-slate-500 text-xs tracking-wider">
+                &copy; <?= date('Y') ?> DReklam. Tüm hakları saklıdır.
+            </p>
         </div>
     </div>
 </body>

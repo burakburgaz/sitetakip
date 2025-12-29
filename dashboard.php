@@ -90,112 +90,387 @@ $queue_history = $pdo->query("
 ?>
 <?php include 'includes/head.php'; ?>
 
-<body class="bg-gray-50 flex h-screen overflow-hidden">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --bg-dark: #0f172a;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-hover: rgba(255, 255, 255, 0.06);
+    }
+
+    body {
+        background-color: var(--bg-dark) !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #f8fafc;
+        overflow: hidden;
+    }
+
+    .bg-blobs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+    }
+
+    .blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+        filter: blur(80px);
+        border-radius: 50%;
+        animation: move 25s infinite alternate;
+    }
+
+    .blob-1 {
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        bottom: -100px;
+        right: -200px;
+        animation-delay: -5s;
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    }
+
+    .blob-3 {
+        top: 30%;
+        right: 10%;
+        animation-delay: -10s;
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
+    }
+
+    @keyframes move {
+        from {
+            transform: translate(0, 0) rotate(0deg);
+        }
+
+        to {
+            transform: translate(100px, 100px) rotate(90deg);
+        }
+    }
+
+    #sidebar {
+        background: rgba(15, 23, 42, 0.6) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid var(--glass-border) !important;
+    }
+
+    #sidebar .bg-white.text-indigo-600 {
+        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%) !important;
+        color: white !important;
+        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4) !important;
+    }
+
+    #sidebar .hover\:bg-indigo-500:hover {
+        background: var(--glass-hover) !important;
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+        background: rgba(15, 23, 42, 0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+
+    .logo-font {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .stat-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: var(--glass-hover);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .renewal-item,
+    .reminder-item {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        transition: all 0.2s ease;
+    }
+
+    .renewal-item:hover,
+    .reminder-item:hover {
+        background: var(--glass-hover) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        transform: translateX(4px);
+    }
+
+    .renewal-item.bg-red-50 {
+        border-left: 4px solid #ef4444 !important;
+    }
+
+    .renewal-item.bg-yellow-50 {
+        border-left: 4px solid #f59e0b !important;
+    }
+
+    .renewal-item.bg-green-50 {
+        border-left: 4px solid #10b981 !important;
+    }
+
+    .reminder-item.bg-red-50 {
+        border-left: 4px solid #ef4444 !important;
+    }
+
+    .reminder-item.bg-yellow-50 {
+        border-left: 4px solid #f59e0b !important;
+    }
+
+    .reminder-item.bg-blue-50 {
+        border-left: 4px solid #3b82f6 !important;
+    }
+</style>
+
+<body class="bg-gray-900 flex h-screen overflow-hidden">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <?php include 'includes/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
         <!-- Header -->
-        <header class="bg-white shadow-sm z-10 p-4 border-b border-gray-200">
+        <header class="z-10 p-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-line text-indigo-600"></i>
-                    Dashboard
-                </h2>
-                <div class="text-sm text-gray-600">
-                    <i class="fa-solid fa-clock mr-2"></i>
-                    <?= date('d.m.Y H:i') ?>
+                <div>
+                    <h2 class="text-3xl font-bold logo-font text-white flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-500/30">
+                            <i class="fa-solid fa-chart-pie text-blue-400 text-xl"></i>
+                        </div>
+                        Kontrol Paneli
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1 tracking-wider uppercase">Sistem Özet Verileri ve Yaklaşan
+                        Hatırlatmalar</p>
+                </div>
+                <div class="text-right">
+                    <div
+                        class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-slate-300">
+                        <i class="fa-solid fa-calendar-day text-blue-400"></i>
+                        <span class="text-sm font-medium"><?= date('d.m.Y') ?></span>
+                        <span
+                            class="text-xs text-slate-500 ml-2 border-l border-white/10 pl-2"><?= date('H:i') ?></span>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-auto p-6">
+        <main class="flex-1 overflow-auto p-8 pt-2">
+
+            <!-- Quick Stats Cards (New Premium Design) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+                <div class="glass-card stat-card p-6 rounded-[2rem]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20">
+                            <i class="fa-solid fa-globe text-blue-400"></i>
+                        </div>
+                        <span
+                            class="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Aktif</span>
+                    </div>
+                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Toplam Site</h4>
+                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['total_sites'] ?></p>
+                </div>
+
+                <div class="glass-card stat-card p-6 rounded-[2rem]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20">
+                            <i class="fa-solid fa-users text-purple-400"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Müşteriler</h4>
+                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['total_customers'] ?></p>
+                </div>
+
+                <div class="glass-card stat-card p-6 rounded-[2rem]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center border border-yellow-500/20">
+                            <i class="fa-solid fa-bolt text-yellow-400"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Bu Ay Yenileme</h4>
+                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['renewals_this_month'] ?></p>
+                </div>
+
+                <div class="glass-card stat-card p-6 rounded-[2rem]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/20">
+                            <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Süresi Dolan</h4>
+                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['expired_sites'] ?></p>
+                </div>
+
+                <div class="glass-card stat-card p-6 rounded-[2rem]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
+                            <i class="fa-solid fa-lira-sign text-emerald-400"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Toplam Gelir</h4>
+                    <p class="text-3xl font-bold text-white mt-1">
+                        <?= number_format($stats['total_revenue'], 0, ',', '.') ?> <span
+                            class="text-lg font-normal opacity-50">₺</span>
+                    </p>
+                </div>
+            </div>
+
             <!-- İki Sütunlu Widget Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
                 <!-- SOL KOLON (Yenilemeler) -->
-                <div class="order-2 lg:order-1 space-y-6">
+                <div class="space-y-8">
                     <!-- Yaklaşan Yenilemeler -->
-                    <div class="bg-white rounded-xl shadow-lg p-5">
-                        <div class="flex items-center justify-between mb-4 border-b pb-3">
-                            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
-                                <i class="fa-solid fa-clock text-yellow-500"></i>
-                                Yenilemeler
-                                <span
-                                    class="ml-1 bg-yellow-100 text-yellow-800 text-[10px] px-1.5 py-0.5 rounded-full"><?= count($upcoming_renewals) ?></span>
-                            </h3>
-                            <a href="sites.php?filter=upcoming"
-                                class="text-xs text-indigo-600 hover:text-indigo-700 font-medium bg-indigo-50 px-2 py-1 rounded">
-                                Tümünü Gör
-                            </a>
+                    <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-10">
+                            <i class="fa-solid fa-clock-rotate-left text-8xl text-blue-500"></i>
                         </div>
-                        <div class="space-y-2" id="renewalsWidget">
+                        <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6 relative z-10">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                    <i class="fa-solid fa-bell text-yellow-500 text-lg"></i>
+                                    Yaklaşan Yenilemeler
+                                </h3>
+                                <p class="text-slate-500 text-xs mt-1">Ödeme günü yaklaşan web siteleri</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-3 py-1 rounded-full border border-yellow-500/30"><?= count($upcoming_renewals) ?>
+                                    KAYIT</span>
+                                <a href="sites.php?filter=upcoming"
+                                    class="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider">Tümü</a>
+                            </div>
+                        </div>
+                        <div class="space-y-3 relative z-10" id="renewalsWidget">
                             <?php if (empty($upcoming_renewals)): ?>
-                                <p class="text-gray-500 text-xs text-center py-4">Yaklaşan yenileme yok</p>
+                                <div class="text-center py-10">
+                                    <div
+                                        class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                        <i class="fa-solid fa-check text-slate-500 text-2xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 text-sm italic">Yaklaşan yenileme bulunmuyor</p>
+                                </div>
                             <?php else: ?>
                                 <?php foreach ($upcoming_renewals as $site): ?>
                                     <?php
                                     $days = days_until_renewal($site['renewal_date']);
                                     $status = get_renewal_status($days);
-                                    $urgency_class = $days <= 7 ? 'bg-red-50 border-l-2 border-red-500' : ($days <= 15 ? 'bg-yellow-50 border-l-2 border-yellow-500' : 'bg-green-50 border-l-2 border-green-500');
+                                    $urgency_class = $days <= 7 ? 'bg-red-50' : ($days <= 15 ? 'bg-yellow-50' : 'bg-green-50');
 
-                                    // Özel durum metni ve ikonu
                                     $status_badge = '';
-
-                                    // Priority to WhatsApp Sent
                                     if ($site['whatsapp_sent'] == 1) {
                                         $wa_time = $site['whatsapp_sent_at'] ? date('d.m H:i', strtotime($site['whatsapp_sent_at'])) : '';
-                                        $status_badge = '<span class="text-[10px] bg-green-100 text-green-800 px-1 rounded flex items-center gap-1" title="Mesaj Gönderildi"><i class="fa-brands fa-whatsapp"></i> ' . $wa_time . '</span>';
+                                        $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-500/30" title="Mesaj Gönderildi"><i class="fa-brands fa-whatsapp"></i> ' . $wa_time . '</span>';
                                     } elseif ($site['status'] == 'requested')
-                                        $status_badge = '<span class="text-[10px] bg-blue-100 text-blue-800 px-1 rounded"><i class="fa-solid fa-paper-plane mr-0.5"></i>İstendi</span>';
+                                        $status_badge = '<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30"><i class="fa-solid fa-paper-plane mr-1 text-[8px]"></i>İstendi</span>';
                                     elseif ($site['status'] == 'accepted')
-                                        $status_badge = '<span class="text-[10px] bg-green-100 text-green-800 px-1 rounded"><i class="fa-solid fa-check mr-0.5"></i>Kabul</span>';
+                                        $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30"><i class="fa-solid fa-check mr-1 text-[8px]"></i>Kabul</span>';
 
-                                    // Hostinger API Date Check
                                     $api_date_display = '';
                                     $accept_btn = '';
                                     if (!empty($site['api_expires_at'])) {
-                                        $api_days = days_until_renewal($site['api_expires_at']);
                                         if (strtotime($site['api_expires_at']) > strtotime($site['renewal_date'])) {
-                                            $api_date_display = '<div class="text-[9px] text-gray-500 mt-0.5 flex items-center gap-1" title="API Gerçek Bitiş"><img src="https://assets.hostinger.com/images/logo-hostinger-black.svg" class="h-2 opacity-50"> ' . format_date($site['api_expires_at']) . '</div>';
-                                            $accept_btn = '<button onclick="acceptRenewal(' . $site['id'] . ')" class="ml-1 bg-green-600 hover:bg-green-700 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm flex items-center gap-0.5 !h-auto !min-h-0" title="Yenilemeyi Onayla"><i class="fa-solid fa-check"></i>Onayla</button>';
+                                            $api_date_display = '<div class="text-[10px] text-blue-400/80 font-medium mt-1 inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-heart text-blue-500"></i> API: ' . format_date($site['api_expires_at']) . '</div>';
+                                            $accept_btn = '<button onclick="event.stopPropagation(); acceptRenewal(' . $site['id'] . ')" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1 rounded-lg transition shadow-lg flex items-center gap-1.5 ml-auto" title="Yenilemeyi Onayla"><i class="fa-solid fa-check-circle"></i>Onayla</button>';
                                         } else {
-                                            $api_date_display = '<div class="text-[9px] text-gray-400 mt-0.5" title="API Bitiş">' . format_date($site['api_expires_at']) . '</div>';
+                                            $api_date_display = '<div class="text-[10px] text-slate-600 mt-1">API: ' . format_date($site['api_expires_at']) . '</div>';
                                         }
                                     }
                                     ?>
-                                    <div class="renewal-item <?= $urgency_class ?> p-2 rounded hover:shadow-sm cursor-pointer transition relative group"
+                                    <div class="renewal-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer group"
                                         data-id="<?= $site['id'] ?>" data-domain="<?= htmlspecialchars($site['domain']) ?>"
                                         data-customer="<?= htmlspecialchars($site['customer_name']) ?>"
                                         data-phone="<?= htmlspecialchars($site['customer_phone']) ?>"
                                         data-status="<?= $site['status'] ?>"
+                                        onclick="showRenewalMenu(event, <?= $site['id'] ?>); return false;"
                                         oncontextmenu="showRenewalMenu(event, <?= $site['id'] ?>); return false;">
 
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex items-center justify-between gap-4">
                                             <div class="flex-1 min-w-0">
-                                                <div class="flex items-center gap-1 mb-0.5 flex-wrap">
-                                                    <p class="font-semibold text-gray-800 text-sm truncate">
+                                                <div class="flex items-center gap-3 mb-1.5 flex-wrap">
+                                                    <p
+                                                        class="font-bold text-white text-base group-hover:text-blue-400 transition-colors">
                                                         <?= htmlspecialchars($site['domain']) ?>
                                                     </p>
                                                     <?= $status_badge ?>
-                                                    <?= $accept_btn ?>
                                                 </div>
-                                                <div class="flex items-center gap-2 text-xs text-gray-600">
-                                                    <span class="truncate"><i
-                                                            class="fa-solid fa-user mr-0.5"></i><?= htmlspecialchars($site['customer_name']) ?></span>
+                                                <div class="flex items-center gap-4 text-xs">
+                                                    <span class="text-slate-400 flex items-center gap-1.5"><i
+                                                            class="fa-solid fa-user text-slate-500"></i><?= htmlspecialchars($site['customer_name']) ?></span>
                                                     <span
-                                                        class="font-bold text-green-600 text-[10px]"><?= number_format($site['price'], 0, ',', '.') ?>
+                                                        class="font-bold text-emerald-400 text-xs bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20"><?= number_format($site['price'], 0, ',', '.') ?>
                                                         ₺</span>
                                                 </div>
                                                 <?= $api_date_display ?>
                                             </div>
-                                            <div class="text-right shrink-0 ml-1">
-                                                <p
-                                                    class="text-xs font-bold <?= $days <= 7 ? 'text-red-600' : 'text-gray-700' ?>">
-                                                    <?= $days ?> gün
-                                                </p>
-                                                <p class="text-[10px] text-gray-500"><?= format_date($site['renewal_date']) ?>
-                                                </p>
+                                            <div class="text-right shrink-0">
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <?php if ($accept_btn):
+                                                        echo $accept_btn;
+                                                    endif; ?>
+                                                    <p
+                                                        class="text-sm font-black <?= $days <= 7 ? 'text-red-400' : 'text-slate-200' ?> uppercase tracking-tighter">
+                                                        <?= $days ?> GÜN KALDI
+                                                    </p>
+                                                    <p class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
+                                                        <?= format_date($site['renewal_date']) ?>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -206,20 +481,21 @@ $queue_history = $pdo->query("
                 </div>
 
                 <!-- SAĞ KOLON (Hatırlatmalar + Mesajlar) -->
-                <div class="order-1 lg:order-2 space-y-6">
+                <div class="space-y-8">
                     <!-- Hatırlatmalar -->
-                    <div class="bg-white rounded-xl shadow-lg p-5">
-                        <div class="flex items-center justify-between mb-4 border-b pb-3">
-                            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
-                                <i class="fa-solid fa-bell text-blue-500"></i>
-                                Hatırlatmalar
-                            </h3>
+                    <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                    <i class="fa-solid fa-thumbtack text-blue-500 text-lg"></i>
+                                    Aktif Hatırlatmalar
+                                </h3>
+                                <p class="text-slate-500 text-xs mt-1">Sizin için önemli notlar ve uyarılar</p>
+                            </div>
                             <a href="calendar.php#reminders"
-                                class="text-xs text-indigo-600 hover:text-indigo-700 font-medium bg-indigo-50 px-2 py-1 rounded">
-                                Tümünü Gör
-                            </a>
+                                class="text-xs font-bold text-blue-400 hover:text-blue-300 uppercase tracking-wider">Tümü</a>
                         </div>
-                        <div class="space-y-2" id="remindersWidget">
+                        <div class="space-y-3" id="remindersWidget">
                             <?php
                             $reminders = $pdo->query("
                                 SELECT r.*, s.domain, c.full_name as customer_name
@@ -229,42 +505,50 @@ $queue_history = $pdo->query("
                                 WHERE r.status = 'pending' 
                                 AND DATE(r.reminder_date) <= DATE('now', '+30 days')
                                 ORDER BY r.reminder_date ASC
-                                LIMIT 10
+                                LIMIT 6
                             ")->fetchAll();
 
                             if (empty($reminders)): ?>
-                                <p class="text-gray-500 text-xs text-center py-4">Yaklaşan hatırlatma yok</p>
+                                <div class="text-center py-10">
+                                    <div
+                                        class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                        <i class="fa-solid fa-calendar-check text-slate-500 text-2xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 text-sm italic">Bekleyen hatırlatmanız yok</p>
+                                </div>
                             <?php else: ?>
                                 <?php foreach ($reminders as $reminder): ?>
                                     <?php
                                     $days_left = days_until_renewal($reminder['reminder_date']);
-                                    $urgency_class = $days_left <= 3 ? 'bg-red-50 border-l-2 border-red-500' : ($days_left <= 7 ? 'bg-yellow-50 border-l-2 border-yellow-500' : 'bg-blue-50 border-l-2 border-blue-500');
+                                    $urgency_class = $days_left <= 3 ? 'bg-red-50' : ($days_left <= 7 ? 'bg-yellow-50' : 'bg-blue-50');
                                     ?>
-                                    <div class="reminder-item <?= $urgency_class ?> p-2 rounded hover:shadow-sm cursor-pointer transition"
+                                    <div class="reminder-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer"
                                         data-id="<?= $reminder['id'] ?>" onclick="showReminderDetail(<?= $reminder['id'] ?>)"
                                         oncontextmenu="showReminderMenu(event, <?= $reminder['id'] ?>); return false;">
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex items-center justify-between gap-4">
                                             <div class="flex-1 min-w-0">
-                                                <p class="font-semibold text-gray-800 text-sm truncate">
+                                                <p class="font-bold text-slate-200 text-sm mb-1 truncate">
                                                     <?= htmlspecialchars($reminder['title']) ?>
                                                 </p>
                                                 <?php if ($reminder['domain']): ?>
-                                                    <p class="text-xs text-gray-600 truncate">🌐
+                                                    <p
+                                                        class="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest flex items-center gap-1.5">
+                                                        <i class="fa-solid fa-link text-[8px]"></i>
                                                         <?= htmlspecialchars($reminder['domain']) ?>
                                                     </p>
                                                 <?php endif; ?>
                                                 <?php if ($reminder['description']): ?>
-                                                    <p class="text-[10px] text-gray-500 mt-0.5 truncate">
-                                                        <?= htmlspecialchars($reminder['description']) ?>
+                                                    <p class="text-[11px] text-slate-500 mt-1 lines-1 italic">
+                                                        "<?= htmlspecialchars($reminder['description']) ?>"
                                                     </p>
                                                 <?php endif; ?>
                                             </div>
-                                            <div class="text-right ml-2 shrink-0">
+                                            <div class="text-right shrink-0">
                                                 <p
-                                                    class="text-xs font-bold <?= $days_left <= 3 ? 'text-red-600' : ($days_left <= 7 ? 'text-yellow-600' : 'text-blue-600') ?>">
-                                                    <?= $days_left ?> gün
+                                                    class="text-xs font-black <?= $days_left <= 3 ? 'text-red-400' : ($days_left <= 7 ? 'text-yellow-400' : 'text-blue-400') ?> uppercase">
+                                                    <?= $days_left ?> GÜN
                                                 </p>
-                                                <p class="text-[10px] text-gray-500">
+                                                <p class="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">
                                                     <?= format_date($reminder['reminder_date']) ?>
                                                 </p>
                                             </div>
@@ -275,34 +559,45 @@ $queue_history = $pdo->query("
                         </div>
                     </div>
 
-                    <!-- Son Gönderilen Mesajlar (YENİ) -->
-                    <div class="bg-white rounded-xl shadow-lg p-5">
-                        <div class="flex items-center justify-between mb-4 border-b pb-3">
-                            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
-                                <i class="fa-solid fa-paper-plane text-green-500"></i>
-                                Son Gönderilen Mesajlar
-                            </h3>
+                    <!-- Son Gönderilen Mesajlar -->
+                    <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                    <i class="fa-solid fa-paper-plane text-emerald-500 text-lg"></i>
+                                    Mesaj Kuyruğu
+                                </h3>
+                                <p class="text-slate-500 text-xs mt-1">Gönderime hazır ve son tamamlananlar</p>
+                            </div>
                         </div>
-                        <div class="space-y-3">
+                        <div class="space-y-4">
                             <!-- Planlananlar -->
                             <?php if (!empty($scheduled_msgs)): ?>
-                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planlananlar
+                                <div
+                                    class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1 flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div> Bekleyen
+                                    Planlar
                                 </div>
                                 <?php foreach ($scheduled_msgs as $msg): ?>
-                                    <div class="flex items-start gap-3 p-2 bg-yellow-50 rounded border border-yellow-100">
-                                        <div class="mt-0.5"><i class="fa-regular fa-clock text-yellow-600"></i></div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-xs text-gray-800 font-medium truncate">
-                                                <?= htmlspecialchars($msg['message']) ?>
-                                            </p>
-                                            <div class="flex items-center gap-2 mt-1 flex-wrap">
-                                                <span
-                                                    class="text-[10px] text-gray-500"><?= format_date($msg['scheduled_at'], 'd.m H:i') ?></span>
-                                                <span class="text-[10px] bg-white px-1 rounded border text-gray-600"
-                                                    title="Telefon"><i
-                                                        class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
-                                                <?php if ($msg['domain']): ?><span
-                                                        class="text-[10px] bg-white px-1 rounded border"><?= htmlspecialchars($msg['domain']) ?></span><?php endif; ?>
+                                    <div
+                                        class="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <div class="flex items-start gap-4">
+                                            <div
+                                                class="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shrink-0">
+                                                <i class="fa-regular fa-clock text-yellow-500 text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs text-slate-200 font-medium leading-relaxed italic">
+                                                    "<?= htmlspecialchars($msg['message']) ?>"
+                                                </p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span
+                                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"><?= format_date($msg['scheduled_at'], 'H:i d.m.y') ?></span>
+                                                    <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                                                    <span
+                                                        class="text-[10px] font-bold text-blue-400 uppercase tracking-widest"><i
+                                                            class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -312,45 +607,47 @@ $queue_history = $pdo->query("
                             <!-- Gönderilenler / Geçmiş -->
                             <?php if (!empty($queue_history)): ?>
                                 <?php if (!empty($scheduled_msgs))
-                                    echo '<div class="border-t my-2"></div>'; ?>
-                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Geçmiş (Queue)
-                                </div>
+                                    echo '<div class="h-px bg-white/5 my-6"></div>'; ?>
+                                <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Son
+                                    İşlemler</div>
                                 <?php foreach ($queue_history as $msg): ?>
                                     <?php
-                                    $statusClass = 'bg-gray-50 border-gray-100';
-                                    $icon = 'fa-check text-gray-400';
-                                    $statusText = $msg['status']; // Fallback
-                            
+                                    $statusClass = 'bg-white/5 border-white/5';
+                                    $icon = 'fa-check text-slate-500';
+                                    $iconColor = 'bg-slate-500/10 border-slate-500/20';
+                                    $statusText = $msg['status'];
+
                                     if ($msg['status'] == 'sent') {
-                                        $statusClass = 'bg-green-50 border-green-100';
-                                        $icon = 'fa-check-double text-green-500';
-                                        $statusText = 'Gönderildi';
+                                        $icon = 'fa-check-double text-emerald-500';
+                                        $iconColor = 'bg-emerald-500/10 border-emerald-500/20';
+                                        $statusText = 'Başarılı';
                                     } elseif ($msg['status'] == 'failed') {
-                                        $statusClass = 'bg-red-50 border-red-100';
                                         $icon = 'fa-times text-red-500';
-                                        $statusText = 'Başarısız';
+                                        $iconColor = 'bg-red-500/10 border-red-500/20';
+                                        $statusText = 'Hata';
                                     } elseif ($msg['status'] == 'cancelled') {
-                                        $statusClass = 'bg-red-50 border-red-100';
-                                        $icon = 'fa-ban text-red-500';
+                                        $icon = 'fa-ban text-orange-500';
+                                        $iconColor = 'bg-orange-500/10 border-orange-500/20';
                                         $statusText = 'İptal';
                                     }
                                     ?>
-                                    <div class="flex items-start gap-3 p-2 <?= $statusClass ?> rounded border">
-                                        <div class="mt-0.5"><i class="fa-solid <?= $icon ?>"></i></div>
+                                    <div
+                                        class="flex items-start gap-4 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition">
+                                        <div
+                                            class="w-8 h-8 rounded-xl <?= $iconColor ?> border flex items-center justify-center shrink-0">
+                                            <i class="fa-solid <?= $icon ?> text-sm"></i>
+                                        </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-xs text-gray-800 font-medium break-all">
+                                            <p class="text-xs text-slate-400 font-medium leading-relaxed truncate">
                                                 <?= htmlspecialchars($msg['message']) ?>
                                             </p>
-                                            <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                            <div class="flex items-center gap-3 mt-2 flex-wrap">
                                                 <span
-                                                    class="text-[10px] text-gray-500"><?= format_date($msg['scheduled_at'], 'd.m H:i') ?></span>
-                                                <span class="text-[10px] bg-white px-1 rounded border text-gray-600"
-                                                    title="Telefon"><i
+                                                    class="text-[10px] font-bold text-slate-600"><?= format_date($msg['scheduled_at'], 'H:i d.m') ?></span>
+                                                <span class="text-[10px] text-slate-500 border-l border-white/10 pl-2 ml-2"><i
                                                         class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
-                                                <?php if ($msg['domain']): ?><span
-                                                        class="text-[10px] bg-white px-1 rounded border"><?= htmlspecialchars($msg['domain']) ?></span><?php endif; ?>
                                                 <span
-                                                    class="text-[10px] uppercase font-bold text-gray-400"><?= $statusText ?></span>
+                                                    class="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md <?= $msg['status'] == 'sent' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400' ?> ml-auto"><?= $statusText ?></span>
                                             </div>
                                         </div>
                                     </div>
@@ -358,10 +655,11 @@ $queue_history = $pdo->query("
                             <?php endif; ?>
 
                             <?php if (empty($queue_history) && empty($scheduled_msgs)): ?>
-                                <p class="text-xs text-gray-400 text-center py-2">Henüz mesaj kaydı yok</p>
+                                <div class="text-center py-6">
+                                    <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Henüz mesaj
+                                        kaydı bulunmuyor</p>
+                                </div>
                             <?php endif; ?>
-
-
                         </div>
                     </div>
                 </div>
