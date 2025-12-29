@@ -14,101 +14,356 @@ try {
 ?>
 <?php include 'includes/head.php'; ?>
 
-<body class='bg-gray-50 flex h-screen overflow-hidden'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #3b82f6;
+        --secondary: #10b981;
+        --bg-dark: #0f172a;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-hover: rgba(255, 255, 255, 0.06);
+    }
+
+    body {
+        background-color: var(--bg-dark) !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #f8fafc;
+    }
+
+    .bg-blobs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        pointer-events: none;
+    }
+
+    .blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+        filter: blur(80px);
+        border-radius: 50%;
+        animation: move 25s infinite alternate;
+    }
+
+    .blob-1 {
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        bottom: -100px;
+        right: -200px;
+        animation-delay: -5s;
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    }
+
+    .blob-3 {
+        top: 30%;
+        right: 10%;
+        animation-delay: -10s;
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, rgba(45, 212, 191, 0.08) 0%, rgba(34, 197, 94, 0.08) 100%);
+    }
+
+    @keyframes move {
+        from {
+            transform: translate(0, 0) rotate(0deg);
+        }
+
+        to {
+            transform: translate(100px, 100px) rotate(90deg);
+        }
+    }
+
+    .glass-header {
+        background: rgba(15, 23, 42, 0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+
+    .logo-font {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .glass-card {
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .stat-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: var(--glass-hover) !important;
+        border-color: rgba(16, 185, 129, 0.3) !important;
+    }
+
+    #customersTable tr {
+        transition: all 0.2s ease;
+    }
+
+    #customersTable tr:hover {
+        background: var(--glass-hover) !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .scale-in {
+        animation: scaleIn 0.3s ease-out forwards;
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Select2 Dark Theme Styling */
+    .select2-container--default .select2-selection--single {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1.25rem !important;
+        height: 56px !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: rgba(16, 185, 129, 0.5) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #cbd5e1 !important;
+        padding-left: 44px !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #64748b !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 56px !important;
+        right: 12px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #64748b transparent transparent transparent !important;
+    }
+
+    .select2-dropdown {
+        background: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1.25rem !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+        backdrop-filter: blur(20px) !important;
+        overflow: hidden !important;
+        margin-top: 8px !important;
+        padding: 4px !important;
+    }
+
+    .select2-search--dropdown {
+        padding: 8px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0.75rem !important;
+        color: white !important;
+        padding: 8px 12px !important;
+    }
+
+    .select2-results__option {
+        color: #94a3b8 !important;
+        padding: 10px 14px !important;
+        border-radius: 0.75rem !important;
+        margin-bottom: 2px !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+        background: rgba(16, 185, 129, 0.2) !important;
+        color: #10b981 !important;
+    }
+
+    .select2-results__option[aria-selected=true] {
+        background: rgba(16, 185, 129, 0.1) !important;
+        color: #10b981 !important;
+    }
+</style>
+
+<body class="flex h-screen overflow-hidden">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
     <?php include 'includes/sidebar.php'; ?>
 
-    <div class='flex-1 flex flex-col h-screen overflow-hidden'>
-        <header class='bg-white shadow-sm z-10 p-4 border-b border-gray-200'>
-            <div class='flex items-center justify-between'>
-                <h2 class='text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2'>
-                    <i class='fa-solid fa-users text-green-600'></i> Müşteriler
+    <div class='flex-1 flex flex-col h-screen overflow-hidden relative z-10'>
+        <header class='glass-header z-20 p-4 border-b border-white/10'>
+            <div class='flex items-center justify-between max-w-[1600px] mx-auto w-full'>
+                <h2 class='text-xl font-bold logo-font text-white flex items-center gap-3'>
+                    <div
+                        class='w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30'>
+                        <i class='fa-solid fa-users text-emerald-400'></i>
+                    </div>
+                    <span>Müşteriler</span>
                 </h2>
-                <div class='flex gap-2'>
+                <div class='flex gap-3'>
                     <button id='bulkActionsBtn'
-                        class='px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition hidden'>
+                        class='hidden px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all font-bold active:scale-95'>
                         <i class='fa-solid fa-tasks mr-2'></i>Toplu İşlemler
                     </button>
                     <button onclick='openCustomerModal()'
-                        class='px-4 py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition'>
-                        <i class='fa-solid fa-user-plus mr-2'></i>Yeni Müşteri Ekle
+                        class='px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center gap-2 font-bold active:scale-95'>
+                        <i class='fa-solid fa-user-plus text-xs'></i>Yeni Müşteri Ekle
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class='flex-1 overflow-auto p-6'>
-            <!-- Main Content Card -->
-            <div class='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden'>
-                <!-- Toolbar -->
-                <div
-                    class='p-5 border-b border-gray-100 bg-white flex flex-col sm:flex-row items-center justify-between gap-4'>
-                    <!-- Filter -->
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <div class="relative w-full sm:w-56">
-                            <select id="filterSelect" onchange="filterCustomers(this.value)"
-                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all appearance-none cursor-pointer font-medium hover:bg-gray-100">
-                                <option value="all">Tüm Müşteriler</option>
-                                <option value="active">Aktif Müşteriler</option>
-                                <option value="passive">Pasif Müşteriler</option>
-                            </select>
+        <main class='flex-1 overflow-auto p-4 md:p-6 lg:p-8'>
+            <div class="max-w-[1600px] mx-auto space-y-6">
+                <!-- Main Content Card -->
+                <div class='glass-card rounded-2xl border border-white/10 overflow-hidden'>
+                    <!-- Toolbar -->
+                    <div
+                        class='p-6 border-b border-white/10 bg-white/5 flex flex-col lg:flex-row items-center justify-between gap-6'>
+                        <!-- Filter -->
+                        <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-4">
+                            <div class="relative w-full sm:w-56">
+                                <i
+                                    class="fa-solid fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <select id="filterSelect" onchange="filterCustomers(this.value)"
+                                    class="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-emerald-500 appearance-none font-semibold text-slate-200 cursor-pointer transition-all hover:bg-white/10">
+                                    <option value="all" class="bg-slate-900">👥 Tüm Müşteriler</option>
+                                    <option value="active" class="bg-slate-900">✅ Aktif Müşteriler</option>
+                                    <option value="passive" class="bg-slate-900">🚫 Pasif Müşteriler</option>
+                                </select>
+                                <i
+                                    class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Search -->
+                        <div class="relative w-full lg:w-96">
                             <i
-                                class="fa-solid fa-filter absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            <i
-                                class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type='text' id='searchInput' placeholder='Müşteri ara...'
+                                class='w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-emerald-500 text-sm placeholder-slate-500 text-slate-200 transition-all hover:bg-white/10'>
                         </div>
                     </div>
 
-                    <!-- Search -->
-                    <div class="relative w-full sm:w-72">
-                        <input type='text' id='searchInput' placeholder='Müşteri ara...'
-                            class='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all'>
-                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <div id='customersTable' class='overflow-x-auto min-h-[400px]'>
+                        <div class="flex flex-col items-center justify-center py-24 space-y-4">
+                            <div
+                                class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin">
+                            </div>
+                            <p class="text-slate-400 font-medium animate-pulse">Müşteriler yükleniyor...</p>
+                        </div>
                     </div>
                 </div>
 
-                <div id='customersTable' class='overflow-x-auto'>
-                    <div class='text-center py-12'>
-                        <div class='spinner mx-auto'></div>
-                        <p class='mt-4 text-gray-600'>Yükleniyor...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Summary Cards (Moved to Bottom) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <!-- Total Customers -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Toplam Müşteri</p>
-                        <h3 class="text-2xl font-bold text-gray-800" id="statTotal">...</h3>
-                    </div>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Total Customers -->
                     <div
-                        class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 shadow-sm">
-                        <i class="fa-solid fa-users text-xl"></i>
+                        class="glass-card stat-card p-6 rounded-[2rem] flex items-center justify-between border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <i class="fa-solid fa-users text-7xl text-blue-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Toplam Müşteri
+                            </p>
+                            <h3 class="text-3xl font-bold text-white" id="statTotal">...</h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20 relative z-10">
+                            <i class="fa-solid fa-users text-blue-400"></i>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Active Customers -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Aktif Müşteriler</p>
-                        <h3 class="text-2xl font-bold text-green-600" id="statActive">...</h3>
-                    </div>
+                    <!-- Active Customers -->
                     <div
-                        class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center text-green-600 shadow-sm">
-                        <i class="fa-solid fa-user-check text-xl"></i>
+                        class="glass-card stat-card p-6 rounded-[2rem] flex items-center justify-between border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <i class="fa-solid fa-user-check text-7xl text-emerald-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Aktif Müşteriler
+                            </p>
+                            <h3 class="text-3xl font-bold text-emerald-400" id="statActive">...</h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20 relative z-10">
+                            <i class="fa-solid fa-user-check text-emerald-400"></i>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Passive Customers -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Pasif Müşteriler</p>
-                        <h3 class="text-2xl font-bold text-red-600" id="statPassive">...</h3>
-                    </div>
+                    <!-- Passive Customers -->
                     <div
-                        class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-600 shadow-sm">
-                        <i class="fa-solid fa-user-xmark text-xl"></i>
+                        class="glass-card stat-card p-6 rounded-[2rem] flex items-center justify-between border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <i class="fa-solid fa-user-xmark text-7xl text-red-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Pasif Müşteriler
+                            </p>
+                            <h3 class="text-3xl font-bold text-red-400" id="statPassive">...</h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/20 relative z-10">
+                            <i class="fa-solid fa-user-xmark text-red-400"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,105 +373,157 @@ try {
 
     <!-- Context Menu -->
     <div id='contextMenu'
-        class='hidden fixed bg-white shadow-2xl rounded-lg py-2 z-[100] border border-gray-200 min-w-[200px]'>
+        class='hidden fixed glass-card rounded-2xl shadow-2xl border border-white/10 z-[100] w-64 overflow-hidden py-1 backdrop-blur-2xl'>
+        <div class="px-4 py-3 border-b border-white/5 mb-1">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Müşteri İşlemleri</p>
+        </div>
         <button onclick='contextMenuAction("whatsapp")'
-            class='w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3'>
-            <i class='fa-brands fa-whatsapp text-green-600'></i>
-            <span>WhatsApp Gönder</span>
+            class='w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group'>
+            <div
+                class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+                <i class='fa-brands fa-whatsapp text-emerald-400 text-sm'></i>
+            </div>
+            <span class="text-sm font-semibold">WhatsApp Gönder</span>
         </button>
         <button onclick='contextMenuAction("toggle_status")'
-            class='w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3'>
-            <i class='fa-solid fa-toggle-on text-blue-600'></i>
-            <span id='statusToggleText'>Pasif Yap</span>
+            class='w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group'>
+            <div
+                class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-all">
+                <i class='fa-solid fa-toggle-on text-blue-400 text-sm'></i>
+            </div>
+            <span id='statusToggleText' class="text-sm font-semibold">Pasif Yap</span>
         </button>
-        <hr class='my-1'>
+        <div class="my-1 border-t border-white/5"></div>
         <button onclick='contextMenuAction("delete")'
-            class='w-full text-left px-4 py-2 hover:bg-red-50 flex items-center gap-3 text-red-600'>
-            <i class='fa-solid fa-trash'></i>
-            <span>Sil</span>
+            class='w-full text-left px-4 py-3 hover:bg-red-500/10 flex items-center justify-start gap-3 text-red-400 transition-all group'>
+            <div
+                class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all">
+                <i class='fa-solid fa-trash text-red-500 text-sm'></i>
+            </div>
+            <span class="text-sm font-bold">Sil</span>
         </button>
     </div>
 
     <!-- WhatsApp Template Modal -->
     <div id='whatsappModal'
-        class='fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 modal-backdrop'>
-        <div class='bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto'>
-            <div class='bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-2xl'>
-                <div class='flex items-center justify-between'>
-                    <h3 class='text-xl font-bold'><i class='fa-brands fa-whatsapp mr-2'></i>WhatsApp Mesajı Gönder</h3>
-                    <button onclick='closeWhatsappModal()' class='text-white hover:text-gray-200'>
-                        <i class='fa-solid fa-times text-2xl'></i>
-                    </button>
+        class='fixed inset-0 bg-slate-950/80 backdrop-blur-xl hidden items-center justify-center z-50 p-4 overflow-y-auto transition-all duration-300'>
+        <div
+            class='glass-card rounded-[2.5rem] border border-white/10 w-full max-w-3xl shadow-[0_0_100px_-20px_rgba(16,185,129,0.3)] overflow-hidden scale-in relative'>
+
+            <!-- Header Section -->
+            <div
+                class='p-8 pb-6 border-b border-white/5 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 flex items-center justify-between relative'>
+                <div class="flex items-center gap-5">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 rotate-3 group-hover:rotate-0 transition-transform">
+                        <i class='fa-brands fa-whatsapp text-white text-xl'></i>
+                    </div>
+                    <div>
+                        <h3 class='text-2xl font-black logo-font text-white tracking-tight'>WhatsApp Mesajı</h3>
+                        <p class="text-slate-400 text-sm font-medium mt-1">Müşterinize hızlıca ulaşın</p>
+                    </div>
                 </div>
+                <button onclick='closeWhatsappModal()'
+                    class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 group">
+                    <i class='fa-solid fa-times text-lg group-hover:rotate-90 transition-transform'></i>
+                </button>
             </div>
-            <div class='p-6'>
-                <div class='space-y-5'>
+
+            <div class='p-8'>
+                <div class='space-y-8'>
                     <!-- Müşteri Bilgileri -->
-                    <div class='bg-gray-50 rounded-lg p-4 border border-gray-200'>
-                        <h4 class='text-sm font-bold text-gray-700 mb-3 flex items-center gap-2'>
-                            <i class='fa-solid fa-user text-indigo-600'></i>
-                            Müşteri Bilgileri
-                        </h4>
-                        <div class='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                            <div>
-                                <label class='block text-xs font-semibold text-gray-600 mb-1'>Ad Soyad</label>
-                                <input type='text' id='waCustomerName'
-                                    class='w-full border rounded-lg px-3 py-2 text-sm'>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-emerald-500">Müşteri Bilgileri
+                            </h4>
+                        </div>
+                        <div
+                            class='grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/[0.02] p-6 rounded-[2rem] border border-white/5'>
+                            <div class="space-y-2 group">
+                                <label class='block text-xs font-bold text-slate-500 ml-1'>Ad Soyad</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' id='waCustomerName' readonly
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-all cursor-default opacity-70'>
+                                </div>
                             </div>
-                            <div>
-                                <label class='block text-xs font-semibold text-gray-600 mb-1'>Telefon</label>
-                                <input type='text' id='waCustomerPhone'
-                                    class='w-full border rounded-lg px-3 py-2 text-sm'>
+                            <div class="space-y-2 group">
+                                <label class='block text-xs font-bold text-slate-500 ml-1'>Telefon</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' id='waCustomerPhone' readonly
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-all cursor-default opacity-70'>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Müşteri Siteleri -->
-                    <div class='bg-blue-50 rounded-lg p-4 border border-blue-200'>
-                        <h4 class='text-sm font-bold text-gray-700 mb-3 flex items-center gap-2'>
-                            <i class='fa-solid fa-globe text-blue-600'></i>
-                            Müşteri Siteleri
-                        </h4>
-                        <div id='waCustomerSites' class='max-h-32 overflow-y-auto'>
-                            <p class='text-xs text-gray-500'>Yükleniyor...</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-blue-500">Müşteri Siteleri
+                            </h4>
                         </div>
-                        <p class='text-xs text-gray-500 mt-2'>Mesajda bahsetmek istediğiniz siteleri seçin</p>
+                        <div id='waCustomerSites'
+                            class='bg-white/[0.02] p-4 rounded-2xl border border-white/5 max-h-32 overflow-y-auto flex flex-wrap gap-2'>
+                            <p class='text-xs text-slate-500 font-bold italic animate-pulse'>Yükleniyor...</p>
+                        </div>
+                        <p class='text-[10px] text-slate-500 font-bold uppercase tracking-widest pl-2'>Mesajda bahsetmek
+                            istediğiniz siteleri seçin</p>
                     </div>
 
                     <!-- Mesaj Şablonu -->
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>
-                            <i class='fa-solid fa-file-alt text-green-600 mr-1'></i>
-                            Mesaj Şablonu
-                        </label>
-                        <select id='whatsappTemplate' class='w-full border rounded-lg px-4 py-2'
-                            onchange='updateWhatsappPreview()'>
-                            <option value='reminder'>Hatırlatma Mesajı</option>
-                            <option value='renewal'>Yenileme Mesajı</option>
-                            <option value='custom'>Özel Mesaj</option>
-                        </select>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-purple-500">Mesaj Şablonu</h4>
+                        </div>
+                        <div class="relative group">
+                            <i
+                                class="fa-solid fa-file-alt absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 text-sm"></i>
+                            <select id='whatsappTemplate'
+                                class='w-full pl-11 pr-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer'
+                                onchange='updateWhatsappPreview()'>
+                                <option value='reminder' class="bg-slate-900">🔔 Hatırlatma Mesajı</option>
+                                <option value='renewal' class="bg-slate-900">⚡ Yenileme Mesajı</option>
+                                <option value='custom' class="bg-slate-900">✍️ Özel Mesaj</option>
+                            </select>
+                            <i
+                                class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                        </div>
                     </div>
 
                     <!-- Mesaj Önizleme -->
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Mesaj Önizleme</label>
-                        <textarea id='whatsappMessage' rows='8'
-                            class='w-full border rounded-lg px-4 py-2 text-sm font-mono bg-gray-50'></textarea>
-                        <div class='flex items-start gap-2 mt-2 text-xs text-gray-500'>
-                            <i class='fa-solid fa-info-circle mt-0.5'></i>
-                            <p>Müşteri adı, firma ve seçili siteler otomatik eklenecektir</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-slate-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Mesaj Önizleme</h4>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-pen-to-square absolute left-4 top-4 text-slate-500 text-sm"></i>
+                            <textarea id='whatsappMessage' rows='8'
+                                class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-[1.5rem] text-white text-sm focus:outline-none focus:border-slate-500/50 transition-all font-mono resize-none'></textarea>
+                        </div>
+                        <div
+                            class='flex items-center gap-2 pl-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest'>
+                            <i class='fa-solid fa-circle-info text-blue-500'></i>
+                            <span>Müşteri adı ve firma bilgileri otomatik eklenecektir</span>
                         </div>
                     </div>
 
                     <!-- Butonlar -->
-                    <div class='flex gap-3 pt-2'>
+                    <div class='flex gap-4 pt-4'>
                         <button onclick='closeWhatsappModal()'
-                            class='flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium'>
+                            class='flex-1 h-14 bg-white/5 border border-white/10 text-white rounded-2xl hover:bg-white/10 transition-all font-bold logo-font text-sm active:scale-95'>
                             İptal
                         </button>
                         <button onclick='sendWhatsAppMessage()'
-                            class='flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition font-bold'>
-                            <i class='fa-brands fa-whatsapp mr-2'></i>WhatsApp'ta Aç
+                            class='flex-[2] h-14 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-2xl hover:shadow-[0_10px_30px_-5px_rgba(16,185,129,0.4)] transition-all font-black logo-font text-sm active:scale-95 flex items-center justify-center gap-2'>
+                            <i class='fa-brands fa-whatsapp text-lg'></i>WhatsApp'ta Aç
                         </button>
                     </div>
                 </div>
@@ -226,94 +533,198 @@ try {
 
     <!-- Müşteri Modal -->
     <div id='customerModal'
-        class='fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 modal-backdrop'>
-        <div class='bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto'>
-            <div class='sticky top-0 bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-2xl'>
-                <div class='flex items-center justify-between'>
-                    <h3 class='text-xl font-bold' id='modalTitle'>Yeni Müşteri Ekle</h3>
-                    <button onclick='closeCustomerModal()' class='text-white hover:text-gray-200'>
-                        <i class='fa-solid fa-times text-2xl'></i>
-                    </button>
+        class='fixed inset-0 bg-slate-950/80 backdrop-blur-xl hidden items-center justify-center z-50 p-4 overflow-y-auto transition-all duration-300'>
+        <div
+            class='glass-card rounded-[2.5rem] border border-white/10 w-full max-w-3xl shadow-[0_0_100px_-20px_rgba(16,185,129,0.3)] overflow-hidden scale-in relative'>
+
+            <!-- Header Section -->
+            <div
+                class='p-8 pb-6 border-b border-white/5 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 flex items-center justify-between relative'>
+                <div class="flex items-center gap-5">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 rotate-3 group-hover:rotate-0 transition-transform">
+                        <i class='fa-solid fa-user-plus text-white text-xl'></i>
+                    </div>
+                    <div>
+                        <h3 class='text-2xl font-black logo-font text-white tracking-tight' id='modalTitle'>Yeni Müşteri
+                            Ekle</h3>
+                        <p class="text-slate-400 text-sm font-medium mt-1">Sistemdeki müşteri ağınızı genişletin</p>
+                    </div>
                 </div>
+                <button onclick='closeCustomerModal()'
+                    class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 group">
+                    <i class='fa-solid fa-times text-lg group-hover:rotate-90 transition-transform'></i>
+                </button>
             </div>
-            <form id='customerForm' class='p-6 space-y-4'>
+
+            <form id='customerForm' class='p-8 space-y-8'>
                 <input type='hidden' id='customerId' name='id'>
                 <input type='hidden' name='action' id='formAction' value='create'>
 
-                <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Ad Soyad *</label>
-                        <input type='text' name='full_name' id='fullName' required
-                            class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Firma Adı</label>
-                        <input type='text' name='company_name' id='companyName'
-                            class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Telefon *</label>
-                        <input type='text' name='phone' id='phone' required placeholder='5XXXXXXXXX'
-                            class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>E-posta</label>
-                        <input type='email' name='email' id='email' class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Şehir</label>
-                        <input type='text' name='city' id='city' class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Durum</label>
-                        <select name='status' id='customerStatus' class='w-full border rounded-lg px-4 py-2'>
-                            <option value='active'>Aktif</option>
-                            <option value='passive'>Pasif</option>
-                        </select>
-                    </div>
-                    <div class='md:col-span-2'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Adres</label>
-                        <input type='text' name='address' id='address' class='w-full border rounded-lg px-4 py-2'>
-                    </div>
-                    <div class='md:col-span-2'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>
-                            <i class='fa-solid fa-globe text-indigo-600 mr-1'></i>
-                            Site İlişkilendirme
-                        </label>
-
-                        <!-- Site ekleme dropdown -->
-                        <div class='mb-3'>
-                            <select id='addSiteDropdown' class='w-full border rounded-lg px-4 py-2 bg-white'>
-                                <option value=''>Site seçerek ekleyin...</option>
-                            </select>
+                <div class='space-y-8'>
+                    <!-- Group 1: Basic Info -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-emerald-500">Temel Bilgiler
+                            </h4>
                         </div>
-
-                        <!-- Seçili siteler - tag görünümü -->
-                        <div id='selectedSitesContainer'
-                            class='min-h-[60px] border-2 border-dashed border-gray-300 rounded-lg p-3 bg-gray-50'>
-                            <div id='selectedSitesTags' class='flex flex-wrap gap-2'>
-                                <span class='text-gray-400 text-sm' id='noSitesText'>Henüz site eklenmedi</span>
+                        <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-emerald-400 transition-colors'>Ad
+                                    Soyad *</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' name='full_name' id='fullName' required
+                                        placeholder="Müşteri adını girin"
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 placeholder-slate-600 transition-all'>
+                                </div>
+                            </div>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-emerald-400 transition-colors'>Firma
+                                    Adı</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-building absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' name='company_name' id='companyName'
+                                        placeholder="Varsa firma adı"
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 placeholder-slate-600 transition-all'>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- Hidden input for form submission -->
-                        <input type='hidden' id='customerSitesHidden' name='sites'>
                     </div>
-                    <div class='md:col-span-2'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Notlar</label>
-                        <textarea name='notes' id='notes' rows='3'
-                            class='w-full border rounded-lg px-4 py-2'></textarea>
+
+                    <!-- Group 2: Contact Info -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-blue-500">İletişim & Konum
+                            </h4>
+                        </div>
+                        <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-blue-400 transition-colors'>Telefon
+                                    *</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' name='phone' id='phone' required placeholder='5XXXXXXXXX'
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 placeholder-slate-600 transition-all'>
+                                </div>
+                            </div>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-blue-400 transition-colors'>E-posta</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='email' name='email' id='email' placeholder="example@mail.com"
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 placeholder-slate-600 transition-all'>
+                                </div>
+                            </div>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-blue-400 transition-colors'>Şehir</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-city absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' name='city' id='city' placeholder="Şehir girin"
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 placeholder-slate-600 transition-all'>
+                                </div>
+                            </div>
+                            <div class="space-y-2 group">
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-emerald-400 transition-colors'>Durum</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-toggle-on absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <select name='status' id='customerStatus'
+                                        class='w-full pl-11 pr-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 appearance-none transition-all cursor-pointer'>
+                                        <option value='active' class="bg-slate-900 text-white">✅ Aktif Müşteri</option>
+                                        <option value='passive' class="bg-slate-900 text-white">🚫 Pasif Müşteri
+                                        </option>
+                                    </select>
+                                    <i
+                                        class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div class='md:col-span-2 space-y-2 group'>
+                                <label
+                                    class='block text-xs font-bold text-slate-400 ml-1 group-focus-within:text-blue-400 transition-colors'>Adres</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type='text' name='address' id='address' placeholder="Detaylı adres bilgisi"
+                                        class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 placeholder-slate-600 transition-all'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group 3: Sites -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-purple-500">Site
+                                    İlişkilendirme</h4>
+                                <span
+                                    class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20 font-bold uppercase tracking-wider">Opsiyonel</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 space-y-4">
+                            <div class='relative group/select'>
+                                <i
+                                    class="fa-solid fa-globe absolute left-4 top-1/2 -translate-y-1/2 text-purple-400/70 text-sm z-10"></i>
+                                <select id='addSiteDropdown'
+                                    class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-sm focus:outline-none focus:border-purple-500/50 transition-all'>
+                                    <option value=''>Site seçerek ekleyin...</option>
+                                </select>
+                            </div>
+
+                            <div id='selectedSitesContainer'
+                                class='min-h-[80px] border-2 border-dashed border-white/5 rounded-2xl p-4 transition-all bg-white/[0.02]'>
+                                <div id='selectedSitesTags' class='flex flex-wrap gap-3'>
+                                    <div class="w-full flex flex-col items-center justify-center py-4 opacity-30 select-none"
+                                        id='noSitesText'>
+                                        <i class="fa-solid fa-cloud-moon text-2xl mb-2"></i>
+                                        <span class='text-xs font-bold italic uppercase tracking-widest'>Bağlı site
+                                            bulunamadı</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden input for form submission -->
+                            <input type='hidden' id='customerSitesHidden' name='sites'>
+                        </div>
+                    </div>
+
+                    <!-- Group 4: Notes -->
+                    <div class="space-y-4 text-left">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-1.5 h-6 bg-slate-500 rounded-full"></span>
+                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Notlar</h4>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-pen-to-square absolute left-4 top-4 text-slate-500 text-sm"></i>
+                            <textarea name='notes' id='notes' rows='4' placeholder="Müşteri hakkında kısa notlar..."
+                                class='w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-[1.5rem] text-white text-sm focus:outline-none focus:border-slate-500/50 focus:ring-4 focus:ring-slate-500/10 placeholder-slate-600 transition-all resize-none'></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <div class='flex gap-3 pt-4'>
+                <div class='flex gap-4 pt-6'>
                     <button type='button' onclick='closeCustomerModal()'
-                        class='flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium'>
-                        İptal
+                        class='flex-1 h-14 bg-white/5 border border-white/10 text-white rounded-2xl hover:bg-white/10 transition-all font-bold logo-font text-sm active:scale-95 shadow-lg shadow-black/20'>
+                        Vazgeç
                     </button>
                     <button type='submit'
-                        class='flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition font-bold'>
-                        <i class='fa-solid fa-save mr-2'></i>Kaydet
+                        class='flex-[2] h-14 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl hover:shadow-[0_10px_30px_-5px_rgba(16,185,129,0.4)] transition-all font-black logo-font text-sm active:scale-95 flex items-center justify-center gap-2'>
+                        <i class='fa-solid fa-save'></i>Kaydet
                     </button>
                 </div>
             </form>

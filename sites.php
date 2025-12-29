@@ -7,75 +7,210 @@ $page_title = 'Siteler - DReklam';
 ?>
 <?php include 'includes/head.php'; ?>
 
-<body class='bg-gray-50 flex h-screen overflow-hidden'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --bg-dark: #0f172a;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-hover: rgba(255, 255, 255, 0.06);
+    }
+
+    body {
+        background-color: var(--bg-dark) !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #f8fafc;
+    }
+
+    .bg-blobs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        pointer-events: none;
+    }
+
+    .blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+        filter: blur(80px);
+        border-radius: 50%;
+        animation: move 25s infinite alternate;
+    }
+
+    .blob-1 {
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        bottom: -100px;
+        right: -200px;
+        animation-delay: -5s;
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    }
+
+    .blob-3 {
+        top: 30%;
+        right: 10%;
+        animation-delay: -10s;
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
+    }
+
+    @keyframes move {
+        from {
+            transform: translate(0, 0) rotate(0deg);
+        }
+
+        to {
+            transform: translate(100px, 100px) rotate(90deg);
+        }
+    }
+
+    .glass-header {
+        background: rgba(15, 23, 42, 0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+
+    .logo-font {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .glass-card {
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Table Improvements */
+    #sitesTable tr {
+        transition: all 0.2s ease;
+    }
+
+    #sitesTable tr:hover {
+        background: var(--glass-hover) !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+
+<body class="flex h-screen overflow-hidden">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <?php include 'includes/sidebar.php'; ?>
 
-    <div class='flex-1 flex flex-col h-screen overflow-hidden'>
-        <header class='bg-white shadow-sm z-10 p-3 border-b border-gray-200'>
-            <div class='flex items-center justify-between'>
-                <h2 class='text-lg font-bold text-gray-800 flex items-center gap-2'>
-                    <i class='fa-solid fa-globe text-indigo-600'></i> Siteler
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        <header class="glass-header z-20 p-4 border-b border-white/10">
+            <div class="flex items-center justify-between max-w-[1600px] mx-auto w-full">
+                <h2 class="text-xl font-bold logo-font text-white flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+                        <i class="fa-solid fa-globe text-blue-400"></i>
+                    </div>
+                    <span>Siteler</span>
                 </h2>
-                <div class='flex items-center gap-2'>
-                    <div class="flex bg-gray-100 rounded-lg p-1">
-                        <button onclick='importSites()' title='Excel İçe Aktar'
-                            class='p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded-md transition'>
-                            <i class='fa-solid fa-file-import'></i>
+                <div class="flex items-center gap-3">
+                    <div class="flex bg-white/5 rounded-xl p-1 border border-white/10">
+                        <button onclick="importSites()" title="Excel İçe Aktar"
+                            class="p-2.5 text-slate-400 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all active:scale-95">
+                            <i class="fa-solid fa-file-import"></i>
                         </button>
-                        <button onclick='exportSites()' title='Excel Dışa Aktar'
-                            class='p-2 text-gray-600 hover:text-green-600 hover:bg-white rounded-md transition'>
-                            <i class='fa-solid fa-file-excel'></i>
+                        <button onclick="exportSites()" title="Excel Dışa Aktar"
+                            class="p-2.5 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition-all active:scale-95">
+                            <i class="fa-solid fa-file-excel"></i>
                         </button>
                     </div>
-                    <button onclick='openSiteModal()'
-                        class='px-3 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition flex items-center gap-1 font-medium'>
-                        <i class='fa-solid fa-plus'></i><span class="hidden sm:inline">Yeni Ekle</span>
+                    <button onclick="openSiteModal()"
+                        class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center gap-2 font-bold active:scale-95">
+                        <i class="fa-solid fa-plus text-xs"></i><span class="hidden sm:inline">Yeni Site Ekle</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class='flex-1 overflow-auto p-4'>
-            <div class='bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden'>
-                <div
-                    class='p-4 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4'>
-                    <!-- Yeni Nesil Filtreleme (Dropdown) -->
-                    <div class="w-full sm:w-auto flex items-center gap-3">
-                        <div class="relative w-full sm:w-64">
-                            <i
-                                class="fa-solid fa-filter absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                            <select id="filterSelect" onchange="filterSites(this.value)"
-                                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500 appearance-none font-medium text-gray-700">
-                                <option value="upcoming" selected>📅 Yaklaşan (30 gün)</option>
-                                <option value="all">📋 Tüm Siteler</option>
-                                <option value="active">✅ Aktif</option>
-                                <option value="expired">⚠️ Süresi Dolmuş</option>
-                                <option value="cancelled">🚫 İptal Edilenler</option>
-                                <option value="transferred">🔄 Transfer Edilenler</option>
-                            </select>
-                            <i
-                                class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+        <main class="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+            <div class="max-w-[1600px] mx-auto space-y-6">
+                <div class="glass-card rounded-2xl border border-white/10 overflow-hidden">
+                    <div
+                        class="p-6 border-b border-white/10 bg-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
+                        <!-- Filters -->
+                        <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-4">
+                            <div class="relative w-full sm:w-72">
+                                <i
+                                    class="fa-solid fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <select id="filterSelect" onchange="filterSites(this.value)"
+                                    class="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-blue-500 appearance-none font-semibold text-slate-200 cursor-pointer transition-all hover:bg-white/10">
+                                    <option value="upcoming" selected class="bg-slate-900">📅 Yaklaşan (30 gün)</option>
+                                    <option value="all" class="bg-slate-900">📋 Tüm Siteler</option>
+                                    <option value="active" class="bg-slate-900">✅ Aktif</option>
+                                    <option value="expired" class="bg-slate-900">⚠️ Süresi Dolmuş</option>
+                                    <option value="cancelled" class="bg-slate-900">🚫 İptal Edilenler</option>
+                                    <option value="transferred" class="bg-slate-900">🔄 Transfer Edilenler</option>
+                                </select>
+                                <i
+                                    class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
+
+                            <button id="bulkActionsBtn"
+                                class="hidden px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all text-xs font-bold whitespace-nowrap active:scale-95">
+                                <i class="fa-solid fa-tasks mr-2"></i>Seçilenlerle İşlem Yap
+                            </button>
                         </div>
 
-                        <button id='bulkActionsBtn'
-                            class='hidden px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-xs font-bold whitespace-nowrap'>
-                            <i class='fa-solid fa-tasks mr-1'></i>İşlemler
-                        </button>
+                        <!-- Search -->
+                        <div class="relative w-full lg:w-96">
+                            <i
+                                class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="searchInput" placeholder="Site, müşteri veya notlarda ara..."
+                                class="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-blue-500 text-sm placeholder-slate-500 text-slate-200 transition-all hover:bg-white/10">
+                        </div>
                     </div>
 
-                    <!-- Arama -->
-                    <div class="relative w-full sm:w-64">
-                        <i
-                            class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type='text' id='searchInput' placeholder='Ara...'
-                            class='w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 text-sm'>
-                    </div>
-                </div>
-
-                <div id='sitesTable' class='overflow-x-auto'>
-                    <div class='text-center py-12'>
-                        <div class='spinner mx-auto'></div>
-                        <p class='mt-4 text-gray-600'>Yükleniyor...</p>
+                    <div id="sitesTable" class="overflow-x-auto min-h-[400px]">
+                        <div class="flex flex-col items-center justify-center py-24 space-y-4">
+                            <div
+                                class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin">
+                            </div>
+                            <p class="text-slate-400 font-medium animate-pulse">Siteler yükleniyor...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,143 +218,184 @@ $page_title = 'Siteler - DReklam';
     </div>
 
     <!-- Context Menu for Right Click -->
-    <div id='contextMenu' class='hidden fixed bg-white rounded-lg shadow-2xl border border-gray-200 z-50 w-56'>
-        <button onclick='contextMenuAction("edit")'
-            class='w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center justify-start gap-2 text-gray-700 rounded-t-lg transition'>
-            <i class='fa-solid fa-edit text-blue-600 w-4'></i>
-            <span>Düzenle</span>
+    <div id="contextMenu"
+        class="hidden fixed glass-card rounded-2xl shadow-2xl border border-white/10 z-50 w-64 overflow-hidden py-1 backdrop-blur-2xl">
+        <div class="px-4 py-3 border-b border-white/5 mb-1">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">İşlemler</p>
+        </div>
+        <button onclick="contextMenuAction('edit')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-all">
+                <i class="fa-solid fa-edit text-blue-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Düzenle</span>
         </button>
-        <button onclick='contextMenuAction("status")'
-            class='w-full text-left px-4 py-3 hover:bg-purple-50 flex items-center justify-start gap-2 text-gray-700 transition'>
-            <i class='fa-solid fa-exchange-alt text-purple-600 w-4'></i>
-            <span>Durum Değiştir</span>
+        <button onclick="contextMenuAction('status')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-all">
+                <i class="fa-solid fa-exchange-alt text-purple-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Durum Değiştir</span>
         </button>
-        <button onclick='contextMenuAction("reminder")'
-            class='w-full text-left px-4 py-3 hover:bg-yellow-50 flex items-center justify-start gap-2 text-gray-700 transition'>
-            <i class='fa-solid fa-bell text-yellow-600 w-4'></i>
-            <span>Hatırlatma Ekle</span>
+        <button onclick="contextMenuAction('reminder')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-all">
+                <i class="fa-solid fa-bell text-yellow-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Hatırlatma Ekle</span>
         </button>
-        <button onclick='contextMenuAction("chat")'
-            class='w-full text-left px-4 py-3 hover:bg-indigo-50 flex items-center justify-start gap-2 text-gray-700 transition'>
-            <i class='fa-solid fa-comments text-indigo-600 w-4'></i>
-            <span>Sohbet Geçmişi</span>
+        <button onclick="contextMenuAction('chat')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-all">
+                <i class="fa-solid fa-comments text-indigo-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Sohbet Geçmişi</span>
         </button>
-        <button onclick='contextMenuAction("whatsapp")'
-            class='w-full text-left px-4 py-3 hover:bg-green-50 flex items-center justify-start gap-2 text-gray-700 transition'>
-            <i class='fa-brands fa-whatsapp text-green-600 w-4'></i>
-            <span>WhatsApp</span>
+        <button onclick="contextMenuAction('whatsapp')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+                <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">WhatsApp</span>
         </button>
-        <button onclick='contextMenuAction("mail")'
-            class='w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center justify-start gap-2 text-gray-700 transition'>
-            <i class='fa-solid fa-envelope text-blue-600 w-4'></i>
-            <span>Mail Gönder</span>
+        <button onclick="contextMenuAction('mail')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center group-hover:bg-sky-500/20 transition-all">
+                <i class="fa-solid fa-envelope text-sky-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Mail Gönder</span>
         </button>
-        <hr class='my-1'>
-        <button onclick='contextMenuAction("delete")'
-            class='w-full text-left px-4 py-3 hover:bg-red-50 flex items-center justify-start gap-2 text-red-600 rounded-b-lg transition'>
-            <i class='fa-solid fa-trash w-4'></i>
-            <span>Sil</span>
+        <div class="my-1 border-t border-white/5"></div>
+        <button onclick="contextMenuAction('delete')"
+            class="w-full text-left px-4 py-3 hover:bg-red-500/10 flex items-center justify-start gap-3 text-red-400 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all">
+                <i class="fa-solid fa-trash text-red-500 text-sm"></i>
+            </div>
+            <span class="text-sm font-bold">Sil</span>
         </button>
     </div>
 
     <!-- Site Modal -->
-    <div id='siteModal'
-        class='fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 modal-backdrop'>
-        <div class='bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto'>
-            <div class='sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl'>
-                <div class='flex items-center justify-between'>
-                    <h3 class='text-xl font-bold' id='modalTitle'>Yeni Site Ekle</h3>
-                    <button onclick='closeSiteModal()' class='text-white hover:text-gray-200'>
-                        <i class='fa-solid fa-times text-2xl'></i>
-                    </button>
-                </div>
+    <div id="siteModal"
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-md hidden items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="glass-card rounded-3xl border border-white/10 w-full max-w-2xl shadow-2xl overflow-hidden scale-in">
+            <div
+                class="p-6 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 flex items-center justify-between">
+                <h3 class="text-xl font-bold font-['Outfit'] text-white flex items-center gap-3" id="modalTitle">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
+                        <i class="fa-solid fa-globe text-white text-sm"></i>
+                    </div>
+                    <span>Yeni Site Ekle</span>
+                </h3>
+                <button onclick="closeSiteModal()"
+                    class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95">
+                    <i class="fa-solid fa-times"></i>
+                </button>
             </div>
-            <form id='siteForm' class='p-6 space-y-4'>
-                <input type='hidden' id='siteId' name='id'>
-                <input type='hidden' name='action' id='formAction' value='create'>
+            <form id="siteForm" class="p-8 space-y-6">
+                <input type="hidden" id="siteId" name="id">
+                <input type="hidden" name="action" id="formAction" value="create">
 
-                <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div class='md:col-span-2'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                            <i class='fa-solid fa-user text-indigo-600'></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2 space-y-2">
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fa-solid fa-user text-blue-500"></i>
                             Müşteri *
-                            <span class="text-xs font-normal text-gray-500">(Aramak için yazmaya başlayın)</span>
+                            <span class="text-[10px] font-normal text-slate-500 normal-case">(Aramak için yazmaya
+                                başlayın)</span>
                         </label>
-                        <div class='flex gap-2'>
+                        <div class="flex gap-2">
                             <div class="flex-1 relative">
-                                <select id='customerId' name='customer_id' required
-                                    class='w-full border rounded-lg px-4 py-2'>
-                                    <option value=''>Müşteri ara veya seç...</option>
+                                <select id="customerId" name="customer_id" required
+                                    class="w-full border border-white/10 rounded-xl px-4 py-3 bg-white/5 text-slate-200">
+                                    <option value="">Müşteri ara veya seç...</option>
                                 </select>
                             </div>
-                            <button type='button' onclick='openQuickCustomer()'
-                                class='px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition font-medium'
-                                title='Hızlı Müşteri Ekle'>
-                                <i class='fa-solid fa-user-plus'></i>
+                            <button type="button" onclick="openQuickCustomer()"
+                                class="w-12 h-12 bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 rounded-xl transition-all flex items-center justify-center active:scale-95"
+                                title="Hızlı Müşteri Ekle">
+                                <i class="fa-solid fa-user-plus"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <i class="fa-solid fa-search mr-1"></i>
-                            Müşteri adı veya firma adına göre arayabilirsiniz
-                        </p>
                     </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Domain *</label>
-                        <input type='text' name='domain' id='siteDomain' required placeholder='ornek.com'
-                            class='w-full border rounded-lg px-4 py-2'>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Domain *</label>
+                        <input type="text" name="domain" id="siteDomain" required placeholder="ornek.com"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all">
                     </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Yenileme Tarihi *</label>
-                        <input type='date' name='renewal_date' id='renewalDate' required
-                            class='w-full border rounded-lg px-4 py-2'>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Yenileme Tarihi
+                            *</label>
+                        <input type="date" name="renewal_date" id="renewalDate" required
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all [color-scheme:dark]">
                     </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Paket Tipi *</label>
-                        <select name='package_type' id='packageType' required class='w-full border rounded-lg px-4 py-2'
-                            onchange='updatePrice()'>
-                            <option value='BASIC'>BASIC</option>
-                            <option value='PRO'>PRO</option>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Paket Tipi
+                            *</label>
+                        <select name="package_type" id="packageType" required
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                            onchange="updatePrice()">
+                            <option value="BASIC" class="bg-slate-900 text-white">BASIC</option>
+                            <option value="PRO" class="bg-slate-900 text-white">PRO</option>
                         </select>
                     </div>
-                    <div>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Fiyat (₺)</label>
-                        <input type='number' name='price' id='sitePrice' step='0.01'
-                            class='w-full border rounded-lg px-4 py-2'>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Fiyat
+                            (₺)</label>
+                        <input type="number" name="price" id="sitePrice" step="0.01"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all">
                     </div>
-                    <div id='statusGroup' class='hidden'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Durum</label>
-                        <select name='status' id='siteStatus' class='w-full border rounded-lg px-4 py-2'>
-                            <option value='active' selected>Aktif</option>
-                            <option value='expired'>Süresi Dolmuş</option>
-                            <option value='cancelled'>İptal Edildi</option>
-                            <option value='transferred'>Transfer</option>
+                    <div id="statusGroup" class="hidden space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Durum</label>
+                        <select name="status" id="siteStatus"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                            <option value="active" selected class="bg-slate-900">Aktif</option>
+                            <option value="expired" class="bg-slate-900">Süresi Dolmuş</option>
+                            <option value="cancelled" class="bg-slate-900">İptal Edildi</option>
+                            <option value="transferred" class="bg-slate-900">Transfer</option>
                         </select>
                     </div>
-                    <div id='hostingerDates' class='md:col-span-2 hidden bg-blue-50 p-3 rounded-lg'>
-                        <div class='text-xs font-semibold text-blue-800 mb-2'><i class='fa-solid fa-server mr-1'></i>
-                            Hostinger Bilgileri</div>
-                        <div class='grid grid-cols-2 gap-2 text-xs'>
-                            <div><span class='text-gray-600'>Açılış:</span> <span id='hostStart'
-                                    class='font-medium'>-</span></div>
-                            <div><span class='text-gray-600'>Bitiş:</span> <span id='hostExpire'
-                                    class='font-medium'>-</span></div>
+                    <div id="hostingerDates"
+                        class="md:col-span-2 hidden bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
+                        <div
+                            class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-server"></i>
+                            Hostinger Bilgileri
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <span class="block text-[10px] text-slate-500 uppercase font-bold mb-1">Açılış</span>
+                                <span id="hostStart" class="text-sm font-semibold text-slate-200">-</span>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <span class="block text-[10px] text-slate-500 uppercase font-bold mb-1">Bitiş</span>
+                                <span id="hostExpire" class="text-sm font-semibold text-slate-200">-</span>
+                            </div>
                         </div>
                     </div>
-                    <div class='md:col-span-2'>
-                        <label class='block text-sm font-semibold text-gray-700 mb-2'>Notlar</label>
-                        <textarea name='notes' id='siteNotes' rows='3'
-                            class='w-full border rounded-lg px-4 py-2'></textarea>
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Notlar</label>
+                        <textarea name="notes" id="siteNotes" rows="3" placeholder="Opsiyonel notlar..."
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-all"></textarea>
                     </div>
                 </div>
 
-                <div class='flex gap-3 pt-4'>
-                    <button type='button' onclick='closeSiteModal()'
-                        class='flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium'>
+                <div class="flex gap-4 pt-6 border-t border-white/10">
+                    <button type="button" onclick="closeSiteModal()"
+                        class="flex-1 px-6 py-3.5 bg-white/5 text-slate-300 rounded-2xl hover:bg-white/10 transition-all font-bold active:scale-95">
                         İptal
                     </button>
-                    <button type='submit'
-                        class='flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition font-bold'>
-                        <i class='fa-solid fa-save mr-2'></i>Kaydet
+                    <button type="submit"
+                        class="flex-1 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:shadow-lg hover:shadow-blue-500/30 transition-all font-bold active:scale-95">
+                        <i class="fa-solid fa-save mr-2"></i>Kaydet
                     </button>
                 </div>
             </form>
@@ -227,35 +403,42 @@ $page_title = 'Siteler - DReklam';
     </div>
 
     <!-- Hızlı Müşteri Modal -->
-    <div id='quickCustomerModal'
-        class='fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-[60] modal-backdrop'>
-        <div class='bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4'>
-            <div class='bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-2xl'>
-                <div class='flex items-center justify-between'>
-                    <h3 class='text-xl font-bold'>Hızlı Müşteri Ekle</h3>
-                    <button onclick='closeQuickCustomer()' class='text-white hover:text-gray-200'>
-                        <i class='fa-solid fa-times text-2xl'></i>
-                    </button>
-                </div>
+    <div id="quickCustomerModal"
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-md hidden items-center justify-center z-[60] p-4">
+        <div class="glass-card rounded-3xl border border-white/10 w-full max-w-md shadow-2xl overflow-hidden scale-in">
+            <div
+                class="p-6 border-b border-white/10 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 flex items-center justify-between">
+                <h3 class="text-xl font-bold font-['Outfit'] text-white flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus text-white text-sm"></i>
+                    </div>
+                    <span>Hızlı Müşteri Ekle</span>
+                </h3>
+                <button onclick="closeQuickCustomer()"
+                    class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95">
+                    <i class="fa-solid fa-times"></i>
+                </button>
             </div>
-            <form id='quickCustomerForm' class='p-6 space-y-4'>
-                <input type='hidden' name='action' value='create'>
-                <div>
-                    <label class='block text-sm font-semibold text-gray-700 mb-2'>Ad Soyad *</label>
-                    <input type='text' name='full_name' required class='w-full border rounded-lg px-4 py-2'>
+            <form id="quickCustomerForm" class="p-8 space-y-6">
+                <input type="hidden" name="action" value="create">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Ad Soyad *</label>
+                    <input type="text" name="full_name" required placeholder="Ad Soyad giriniz"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-emerald-500 transition-all">
                 </div>
-                <div>
-                    <label class='block text-sm font-semibold text-gray-700 mb-2'>Firma Adı</label>
-                    <input type='text' name='company_name' class='w-full border rounded-lg px-4 py-2'>
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Firma Adı</label>
+                    <input type="text" name="company_name" placeholder="Varsa firma adı"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-emerald-500 transition-all">
                 </div>
-                <div>
-                    <label class='block text-sm font-semibold text-gray-700 mb-2'>Telefon *</label>
-                    <input type='text' name='phone' required placeholder='5XXXXXXXXX'
-                        class='w-full border rounded-lg px-4 py-2'>
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Telefon *</label>
+                    <input type="text" name="phone" required placeholder="5XXXXXXXXX"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-emerald-500 transition-all">
                 </div>
-                <button type='submit'
-                    class='w-full px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition font-bold'>
-                    <i class='fa-solid fa-user-plus mr-2'></i>Müşteri Ekle
+                <button type="submit"
+                    class="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all font-bold active:scale-95">
+                    <i class="fa-solid fa-user-plus mr-2"></i>Müşteri Ekle
                 </button>
             </form>
         </div>
@@ -524,64 +707,89 @@ $page_title = 'Siteler - DReklam';
         }
     </script>
     <style>
-        .filter-btn {
-            background: #f3f4f6;
-            color: #374151;
+        .scale-in {
+            animation: scaleIn 0.3s ease-out forwards;
         }
 
-        .filter-btn.active {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        /* Select2 Custom Styling */
+        /* Select2 Dark Modern Styling */
         .select2-container--default .select2-selection--single {
-            height: 42px !important;
-            border: 1px solid #d1d5db !important;
-            border-radius: 0.5rem !important;
+            height: 48px !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 0.75rem !important;
             padding: 0.5rem 1rem !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 26px !important;
+            color: #e2e8f0 !important;
             padding-left: 0 !important;
-            color: #374151 !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 40px !important;
-            right: 8px !important;
+            height: 46px !important;
+            right: 12px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #94a3b8 transparent transparent transparent !important;
         }
 
         .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+            border-color: #3b82f6 !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .select2-dropdown {
-            border: 1px solid #d1d5db !important;
+            background-color: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+            padding: 4px !important;
+            margin-top: 4px !important;
+            overflow: hidden !important;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 0.5rem !important;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #6366f1 !important;
-        }
-
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #d1d5db !important;
-            border-radius: 0.375rem !important;
-            padding: 0.5rem !important;
-        }
-
-        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-            border-color: #6366f1 !important;
-            outline: none !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+            color: #f8fafc !important;
+            padding: 8px 12px !important;
         }
 
         .select2-results__option {
-            padding: 8px 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 0.5rem !important;
+            color: #94a3b8 !important;
+            font-size: 0.875rem !important;
+            margin-bottom: 2px !important;
+            transition: all 0.2s !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: rgba(59, 130, 246, 0.2) !important;
+            color: #3b82f6 !important;
         }
     </style>
     <!-- jQuery, SweetAlert2, API Helper, Select2 already loaded above -->

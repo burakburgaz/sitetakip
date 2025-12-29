@@ -88,7 +88,7 @@ try {
         $customer = $stmt->fetch();
 
         if ($customer) {
-            // Get customer's sites
+            // Müşteriye ait siteleri getir
             $stmt = $pdo->prepare("SELECT id, domain FROM sites WHERE customer_id = ? AND status = 'active'");
             $stmt->execute([$id]);
             $sites = $stmt->fetchAll();
@@ -104,7 +104,7 @@ try {
         }
     }
 
-    // EKLE
+    // EKLE (CREATE)
     if ($action === 'create') {
         $full_name = sanitize_input($_POST['full_name'] ?? '');
         $company_name = sanitize_input($_POST['company_name'] ?? '');
@@ -116,15 +116,11 @@ try {
         $status = sanitize_input($_POST['status'] ?? 'active');
         $sites_raw = $_POST['sites'] ?? '';
 
-        // Parse sites - can be array or comma-separated string
-        if (is_array($sites_raw)) {
-            $sites = array_filter($sites_raw); // Remove empty values
-        } else {
-            $sites = $sites_raw ? array_filter(explode(',', $sites_raw)) : [];
-        }
+        // Site dizisini çözümle
+        $sites = is_array($sites_raw) ? array_filter($sites_raw) : ($sites_raw ? array_filter(explode(',', $sites_raw)) : []);
 
-        if (!$full_name || !$phone) {
-            json_response(['status' => 'error', 'message' => 'Ad Soyad ve Telefon gerekli'], 400);
+        if (empty($full_name) || empty($phone)) {
+            json_response(['status' => 'error', 'message' => 'Ad Soyad ve Telefon alanları zorunludur'], 400);
         }
 
         if ($email && !validate_email($email)) {
@@ -136,22 +132,20 @@ try {
 
         $customer_id = $pdo->lastInsertId();
 
-        // Update site relationships
+        // Site ilişkilerini güncelle
         if (!empty($sites)) {
             $stmt = $pdo->prepare("UPDATE sites SET customer_id = ? WHERE id = ?");
             foreach ($sites as $site_id) {
-                if ($site_id) { // Skip empty values
+                if ($site_id)
                     $stmt->execute([$customer_id, $site_id]);
-                }
             }
         }
 
         log_activity($pdo, 'Müşteri Eklendi', "Ad: $full_name");
-
-        json_response(['status' => 'success', 'message' => 'Müşteri eklendi', 'id' => $customer_id, 'full_name' => $full_name]);
+        json_response(['status' => 'success', 'message' => 'Müşteri başarıyla eklendi', 'id' => $customer_id]);
     }
 
-    // GÜNCELLE
+    // GÜNCELLE (UPDATE)
     if ($action === 'update') {
         $id = $_POST['id'] ?? 0;
         $full_name = sanitize_input($_POST['full_name'] ?? '');
@@ -164,53 +158,30 @@ try {
         $status = sanitize_input($_POST['status'] ?? 'active');
         $sites_raw = $_POST['sites'] ?? '';
 
-        // Parse sites - can be array or comma-separated string
-        if (is_array($sites_raw)) {
-            $sites = array_filter($sites_raw); // Remove empty values
-        } else {
-            $sites = $sites_raw ? array_filter(explode(',', $sites_raw)) : [];
-        }
+        $sites = is_array($sites_raw) ? array_filter($sites_raw) : ($sites_raw ? array_filter(explode(',', $sites_raw)) : []);
 
-        if (!$id || !$full_name || !$phone) {
+        if (!$id || empty($full_name) || empty($phone)) {
             json_response(['status' => 'error', 'message' => 'Gerekli alanları doldurun'], 400);
-        }
-
-        if ($email && !validate_email($email)) {
-            json_response(['status' => 'error', 'message' => 'Geçersiz e-posta adresi'], 400);
         }
 
         $stmt = $pdo->prepare("UPDATE customers SET full_name = ?, company_name = ?, phone = ?, email = ?, address = ?, city = ?, notes = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
         $stmt->execute([$full_name, $company_name, $phone, $email, $address, $city, $notes, $status, $id]);
 
-        // Update site relationships
-        // First, get current customer's sites
-        $stmt = $pdo->prepare("SELECT id FROM sites WHERE customer_id = ?");
+        // Mevcut site ilişkilerini temizle ve yenilerini ekle
+        // Not: Burada mantık, seçilmeyen siteleri bu müşteriden "ayırmak" ise:
+        $stmt = $pdo->prepare("UPDATE sites SET customer_id = 0 WHERE customer_id = ?");
         $stmt->execute([$id]);
-        $currentSites = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Remove sites that are no longer associated (set to customer ID 0 or leave unchanged)
-        // We don't set to NULL because customer_id is NOT NULL
-        foreach ($currentSites as $currentSiteId) {
-            if (!in_array($currentSiteId, $sites)) {
-                // Site is no longer associated with this customer
-                // Option: either keep unchanged or assign to a default "unassigned" customer
-                // For now, we'll keep it unchanged (do nothing)
-            }
-        }
-
-        // Assign selected sites to this customer
         if (!empty($sites)) {
             $stmt = $pdo->prepare("UPDATE sites SET customer_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
             foreach ($sites as $site_id) {
-                if ($site_id) { // Skip empty values
+                if ($site_id)
                     $stmt->execute([$id, $site_id]);
-                }
             }
         }
 
         log_activity($pdo, 'Müşteri Güncellendi', "ID: $id");
-
-        json_response(['status' => 'success', 'message' => 'Müşteri güncellendi']);
+        json_response(['status' => 'success', 'message' => 'Müşteri bilgileri güncellendi']);
     }
 
     // DURUM GÜNCELLE

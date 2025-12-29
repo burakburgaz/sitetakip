@@ -97,7 +97,12 @@ function filterCustomers(filter) {
 }
 
 function loadCustomers() {
-    $('#customersTable').html('<div class="text-center py-12"><div class="spinner mx-auto"></div><p class="mt-4 text-gray-600">Yükleniyor...</p></div>');
+    $('#customersTable').html(`
+        <div class="flex flex-col items-center justify-center py-24 space-y-4">
+            <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+            <p class="text-slate-400 font-medium animate-pulse text-sm">Müşteriler yükleniyor...</p>
+        </div>
+    `);
 
     $.get('api/customers.php', {
         action: 'list',
@@ -125,56 +130,56 @@ function loadCustomers() {
 function renderCustomersTable(customers) {
     if (customers.length === 0) {
         $('#customersTable').html(`
-            <div class="text-center py-16">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-users text-gray-400 text-2xl"></i>
+            <div class="flex flex-col items-center justify-center py-24 px-6 text-center">
+                <div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mb-6 border border-white/10">
+                    <i class="fa-solid fa-users text-slate-500 text-3xl"></i>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900">Müşteri Bulunamadı</h3>
-                <p class="text-gray-500 mt-1">Arama kriterlerinize uygun kayıt yok.</p>
+                <h3 class="text-xl font-bold text-white mb-2 logo-font">Müşteri Bulunamadı</h3>
+                <p class="text-slate-500 text-sm max-w-xs mx-auto font-medium">Arama kriterlerinize uygun herhangi bir müşteri kaydı bulunmuyor.</p>
             </div>
         `);
         return;
     }
 
     let html = `
-        <table class="w-full text-left border-collapse">
-            <thead class="bg-gray-50 sticky top-0 z-10">
+        <table class="w-full text-left border-separate border-spacing-y-2 px-6">
+            <thead>
                 <tr>
-                    <th class="p-4 w-10 border-b border-gray-200">
+                    <th class="p-4 w-12 text-center">
                         <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" 
-                            class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                            class="w-5 h-5 rounded-lg border-white/10 bg-white/5 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 transition-all cursor-pointer">
                     </th>
-                    <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Müşteri Bilgileri</th>
-                    <th class="hidden md:table-cell p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Firma</th>
-                    <th class="hidden sm:table-cell p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Telefon</th>
-                    <th class="hidden xl:table-cell p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Siteler</th>
-                    <th class="hidden lg:table-cell p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Durum</th>
-                    <th class="p-4 w-24 border-b border-gray-200 text-right">İşlemler</th>
+                    <th class="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Müşteri Bilgileri</th>
+                    <th class="hidden md:table-cell p-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Firma</th>
+                    <th class="hidden sm:table-cell p-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">İletişim</th>
+                    <th class="hidden xl:table-cell p-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Sitelere Ait</th>
+                    <th class="hidden lg:table-cell p-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Durum</th>
+                    <th class="p-4 w-24 text-right"></th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 bg-white">`;
+            <tbody>`;
 
     customers.forEach(c => {
         const statusBadge = c.status === 'active'
-            ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>Aktif</span>'
-            : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><span class="w-1.5 h-1.5 bg-gray-500 rounded-full mr-1.5"></span>Pasif</span>';
+            ? '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><div class="w-1 h-1 bg-emerald-400 rounded-full animate-pulse"></div>Aktif</span>'
+            : '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20"><div class="w-1 h-1 bg-red-400 rounded-full"></div>Pasif</span>';
 
         // Show only first 3 sites, with indicator if more exist
         let sitesDisplay = '';
         if (c.sites && c.sites.length > 0) {
             const visibleSites = c.sites.slice(0, 3);
             sitesDisplay = visibleSites.map(s => `
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 mr-1 mb-1 border border-indigo-100">
-                    <i class="fa-solid fa-globe text-[10px] mr-1 opacity-70"></i>${s}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-500/10 text-blue-400 mr-2 mb-2 border border-blue-500/20">
+                    <i class="fa-solid fa-globe text-[9px] mr-1.5 opacity-70"></i>${s}
                 </span>`
             ).join('');
 
             if (c.sites.length > 3) {
                 const remaining = c.sites.length - 3;
-                sitesDisplay += `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">+${remaining}</span>`;
+                sitesDisplay += `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black bg-white/5 text-slate-500 border border-white/10 mb-2">+${remaining}</span>`;
             }
         } else {
-            sitesDisplay = '<span class="text-gray-400 text-xs italic">Site eklenmemiş</span>';
+            sitesDisplay = '<span class="text-slate-600 text-[11px] font-bold italic">Kayıtlı site bulunmuyor</span>';
         }
 
         // Mobile-visible extra info
@@ -189,32 +194,41 @@ function renderCustomersTable(customers) {
             </div>
         `;
 
-        html += `<tr class="customer-row group hover:bg-gray-50 transition-colors duration-150" data-id="${c.id}" data-status="${c.status || 'active'}">
-            <td class="p-4 align-top sm:align-middle">
-                <input type="checkbox" class="customer-checkbox hidden w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" value="${c.id}" onchange="updateBulkActions()">
+        html += `<tr class="customer-row group hover:bg-white/5 transition-all duration-300" data-id="${c.id}" data-status="${c.status || 'active'}">
+            <td class="p-4 align-middle text-center">
+                <input type="checkbox" class="customer-checkbox w-5 h-5 rounded-lg border-white/10 bg-white/5 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 transition-all cursor-pointer" value="${c.id}" onchange="updateBulkActions()">
             </td>
-            <td class="p-4 align-top sm:align-middle">
-                <div>
-                    <div class="font-semibold text-gray-900">${c.full_name}</div>
-                    ${mobileInfo}
+            <td class="p-4 align-middle">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500/10 to-blue-500/10 flex items-center justify-center border border-white/10 shrink-0">
+                        <i class="fa-solid fa-user text-emerald-400/70 text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-white text-sm group-hover:text-emerald-400 transition-colors">${c.full_name}</div>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5 xl:hidden">${c.company_name || 'Şahıs'}</div>
+                    </div>
                 </div>
             </td>
-            <td class="hidden md:table-cell p-4 align-middle text-sm text-gray-600">${c.company_name || '-'}</td>
-            <td class="hidden sm:table-cell p-4 align-middle text-sm">
-                <a href="tel:${c.phone}" class="text-gray-600 hover:text-indigo-600 transition-colors font-mono">
-                    ${formatPhoneNumber(c.phone)}
-                </a>
+            <td class="hidden md:table-cell p-4 align-middle">
+                <span class="text-slate-400 text-xs font-bold">${c.company_name || '<span class="opacity-30 italic">Bireysel</span>'}</span>
             </td>
-            <td class="hidden xl:table-cell p-4 align-middle text-sm max-w-sm">${sitesDisplay}</td>
+            <td class="hidden sm:table-cell p-4 align-middle">
+                <div class="flex flex-col">
+                    <a href="tel:${c.phone}" class="text-white text-sm font-bold hover:text-emerald-400 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-phone text-[10px] text-slate-500"></i>
+                        ${formatPhoneNumber(c.phone)}
+                    </a>
+                    ${c.email ? `<span class="text-[10px] text-slate-500 font-medium mt-1 truncate max-w-[150px]"><i class="fa-solid fa-envelope mr-1"></i>${c.email}</span>` : ''}
+                </div>
+            </td>
+            <td class="hidden xl:table-cell p-4 align-middle max-w-sm">${sitesDisplay}</td>
             <td class="hidden lg:table-cell p-4 align-middle">${statusBadge}</td>
             <td class="p-4 align-middle text-right">
-                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onclick="openWhatsappModal(${c.id})" class="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 hover:scale-105 transition-all" title="WhatsApp Mesajı Gönder"><i class="fa-brands fa-whatsapp text-lg"></i></button>
-                    <button onclick="editCustomer(${c.id})" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 hover:scale-105 transition-all" title="Düzenle"><i class="fa-solid fa-edit"></i></button>
-                    <button onclick="deleteCustomer(${c.id})" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:scale-105 transition-all" title="Sil"><i class="fa-solid fa-trash"></i></button>
+                <div class="flex items-center justify-end gap-2 pr-2">
+                    <button onclick="openWhatsappModal(${c.id})" class="w-9 h-9 flex items-center justify-center bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-white transition-all transform active:scale-90" title="WhatsApp"><i class="fa-brands fa-whatsapp text-lg"></i></button>
+                    <button onclick="editCustomer(${c.id})" class="w-9 h-9 flex items-center justify-center bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500 hover:text-white transition-all transform active:scale-90" title="Düzenle"><i class="fa-solid fa-edit text-sm"></i></button>
+                    <button onclick="deleteCustomer(${c.id})" class="w-9 h-9 flex items-center justify-center bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all transform active:scale-90" title="Sil"><i class="fa-solid fa-trash text-sm"></i></button>
                 </div>
-                <!-- Mobile only action button dots -->
-                 <button class="md:hidden text-gray-400"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             </td>
         </tr>`;
     });
@@ -515,7 +529,12 @@ function updateSelectedSitesDisplay() {
     $('#customerSitesHidden').val(JSON.stringify(customerSiteIds));
 
     if (customerSiteIds.length === 0) {
-        $('#selectedSitesTags').html('<span class="text-gray-400 text-sm" id="noSitesText">Henüz site eklenmedi</span>');
+        $('#selectedSitesTags').html(`
+            <div class="w-full flex flex-col items-center justify-center py-4 opacity-30 select-none" id='noSitesText'>
+                <i class="fa-solid fa-cloud-moon text-2xl mb-2"></i>
+                <span class='text-xs font-bold italic uppercase tracking-widest text-slate-400'>Bağlı site bulunamadı</span>
+            </div>
+        `);
         return;
     }
 
@@ -527,11 +546,11 @@ function updateSelectedSitesDisplay() {
                 const site = res.data.find(s => s.id.toString() === siteId.toString());
                 if (site) {
                     tagsHtml += `
-                        <span class="inline-flex items-center gap-2 bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-full text-sm font-medium">
-                            <i class="fa-solid fa-globe text-xs"></i>
+                        <span class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold border border-emerald-500/20 group/tag hover:bg-emerald-500/20 transition-all">
+                            <i class="fa-solid fa-globe text-[10px] opacity-70"></i>
                             ${site.domain}
-                            <button type="button" onclick="removeSiteFromCustomer('${siteId}')" class="hover:bg-indigo-200 rounded-full p-0.5">
-                                <i class="fa-solid fa-times text-xs"></i>
+                            <button type="button" onclick="removeSiteFromCustomer('${siteId}')" class="ml-1 hover:text-white transition-colors">
+                                <i class="fa-solid fa-times text-[10px]"></i>
                             </button>
                         </span>
                     `;

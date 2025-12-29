@@ -11,30 +11,106 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 <!-- Sidebar Overlay (Mobile Only) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
 
-<aside id='sidebar'
-    class='w-20 bg-gradient-to-b from-indigo-600 to-purple-700 text-white flex flex-col transition-all duration-300 shadow-2xl'>
+<style>
+    :root {
+        --sidebar-bg: rgba(15, 23, 42, 0.7);
+        --sidebar-border: rgba(255, 255, 255, 0.1);
+        --sidebar-hover: rgba(255, 255, 255, 0.08);
+        --sidebar-active: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        --primary: #3b82f6;
+    }
+
+    #sidebar {
+        background: var(--sidebar-bg) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid var(--sidebar-border) !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .sidebar-item {
+        transition: all 0.2s ease;
+        margin: 4px 0;
+        border: 1px solid transparent;
+    }
+
+    .sidebar-item:hover {
+        background: var(--sidebar-hover) !important;
+        border-color: rgba(255, 255, 255, 0.05);
+        transform: translateX(4px);
+    }
+
+    .sidebar-item.active {
+        background: var(--sidebar-active) !important;
+        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-text {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+    }
+
+    .logo-font {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    #notificationBtn {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+
+    #notificationBtn:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    #toggleSidebar,
+    #logoutBtn {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+
+    #toggleSidebar:hover {
+        background: rgba(59, 130, 246, 0.1) !important;
+        color: var(--primary) !important;
+    }
+
+    #logoutBtn:hover {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #ef4444 !important;
+        border-color: rgba(239, 68, 68, 0.2) !important;
+    }
+</style>
+
+<aside id='sidebar' class='w-20 text-white flex flex-col transition-all duration-300 shadow-2xl relative z-[100]'>
     <!-- Logo ve Başlık -->
-    <div class='p-6 border-b border-indigo-500'>
+    <div class='p-6 border-b border-white/10'>
         <div class='flex items-center gap-3'>
-            <div class='bg-white rounded-lg p-2'>
-                <i class='fa-solid fa-globe text-indigo-600 text-2xl'></i>
+            <div
+                class='w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20'>
+                <i class='fa-solid fa-globe text-white text-xl'></i>
             </div>
             <div class='sidebar-text hidden opacity-0'>
-                <h1 class='text-xl font-bold'>DReklam</h1>
-                <p class='text-xs text-indigo-200'>Site Takip</p>
+                <h1 class='text-xl font-bold logo-font tracking-tight'>DReklam</h1>
+                <p class='text-[10px] text-blue-400 font-bold uppercase tracking-widest'>Site Takip</p>
             </div>
         </div>
     </div>
 
     <!-- Kullanıcı Bilgisi -->
-    <div class='p-4 border-b border-indigo-500'>
-        <div class='flex items-center gap-3'>
-            <div class='w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center'>
-                <i class='fa-solid fa-user text-white'></i>
+    <div class='p-4 border-b border-white/10'>
+        <div class='flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/5'>
+            <div class='w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30'>
+                <i class='fa-solid fa-user text-blue-400'></i>
             </div>
-            <div class='sidebar-text hidden opacity-0 flex-1'>
-                <p class='font-semibold text-sm'><?= htmlspecialchars($_SESSION['name_surname']) ?></p>
-                <p class='text-xs text-indigo-200'><?= ucfirst($_SESSION['role']) ?></p>
+            <div class='sidebar-text hidden opacity-0 flex-1 min-w-0'>
+                <p class='font-bold text-sm truncate'><?= htmlspecialchars($_SESSION['name_surname']) ?></p>
+                <p class='text-[10px] text-slate-400 uppercase font-black tracking-tighter'>
+                    <?= ucfirst($_SESSION['role']) ?></p>
             </div>
         </div>
     </div>
@@ -85,35 +161,35 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
         <ul class='space-y-2'>
             <li>
                 <a href='dashboard.php'
-                    class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'dashboard' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                    class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'dashboard' ? 'active shadow-lg' : '' ?>'>
                     <i class='fa-solid fa-chart-line text-lg w-5'></i>
                     <span class='sidebar-text hidden opacity-0'>Dashboard</span>
                 </a>
             </li>
             <li>
                 <a href='sites.php'
-                    class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'sites' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                    class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'sites' ? 'active shadow-lg' : '' ?>'>
                     <i class='fa-solid fa-globe text-lg w-5'></i>
                     <span class='sidebar-text hidden opacity-0'>Siteler</span>
                 </a>
             </li>
             <li>
                 <a href='customers.php'
-                    class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'customers' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                    class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'customers' ? 'active shadow-lg' : '' ?>'>
                     <i class='fa-solid fa-users text-lg w-5'></i>
                     <span class='sidebar-text hidden opacity-0'>Müşteriler</span>
                 </a>
             </li>
             <li>
                 <a href='contacts.php'
-                    class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'contacts' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                    class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'contacts' ? 'active shadow-lg' : '' ?>'>
                     <i class='fa-solid fa-address-book text-lg w-5'></i>
                     <span class='sidebar-text hidden opacity-0'>Rehber</span>
                 </a>
             </li>
             <li>
                 <a href='calendar.php'
-                    class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'calendar' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                    class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'calendar' ? 'active shadow-lg' : '' ?>'>
                     <i class='fa-solid fa-calendar text-lg w-5'></i>
                     <span class='sidebar-text hidden opacity-0'>Takvim</span>
                 </a>
@@ -122,15 +198,15 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             <?php if ($_SESSION['role'] === 'admin'): ?>
                 <li>
                     <a href='statistics.php'
-                        class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'statistics' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                        class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'statistics' ? 'active shadow-lg' : '' ?>'>
                         <i class='fa-solid fa-chart-pie text-lg w-5'></i>
                         <span class='sidebar-text hidden opacity-0'>İstatistikler</span>
                     </a>
                 </li>
 
-                <li class='pt-4 mt-4 border-t border-indigo-500'>
+                <li class='pt-4 mt-4 border-t border-white/10'>
                     <a href='settings.php'
-                        class='flex items-center gap-3 p-3 rounded-lg transition <?= $current_page == 'settings' ? 'bg-white text-indigo-600 shadow-lg' : 'hover:bg-indigo-500' ?>'>
+                        class='sidebar-item flex items-center gap-3 p-3 rounded-xl transition <?= $current_page == 'settings' ? 'active shadow-lg' : '' ?>'>
                         <i class='fa-solid fa-cog text-lg w-5'></i>
                         <span class='sidebar-text hidden opacity-0'>Ayarlar</span>
                     </a>
@@ -140,24 +216,23 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     </nav>
 
     <!-- Alt Kısım -->
-    <div class='p-4 border-t border-indigo-500'>
+    <div class='p-4 border-t border-white/10 space-y-2'>
         <!-- Notification Button -->
         <button id="notificationBtn" onclick="toggleNotifications()"
-            class="relative w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 transition mb-2">
+            class="relative w-full flex items-center justify-center gap-2 p-2 rounded-xl transition">
             <i class="fa-regular fa-clock text-lg"></i>
-            <span class="sidebar-text hidden opacity-0 ml-2 text-sm">Bekleyenler</span>
+            <span class="sidebar-text hidden opacity-0 ml-2 text-sm font-bold">Bekleyenler</span>
             <span id="pendingCountBadge"
-                class="hidden absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-indigo-600 min-w-[20px] text-center">0</span>
+                class="hidden absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-[#0f172a] min-w-[22px] text-center shadow-lg">0</span>
         </button>
 
-        <button id='toggleSidebar'
-            class='w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 transition'>
+        <button id='toggleSidebar' class='w-full flex items-center justify-center gap-2 p-2 rounded-xl transition'>
             <i class='fa-solid fa-chevron-right transition-transform'></i>
         </button>
-        <a href='logout.php'
-            class='mt-2 w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-red-500 hover:bg-red-600 transition'>
+        <a href='logout.php' id="logoutBtn"
+            class='w-full flex items-center justify-center gap-2 p-2 rounded-xl transition'>
             <i class='fa-solid fa-sign-out-alt'></i>
-            <span class='sidebar-text hidden opacity-0'>Çıkış</span>
+            <span class='sidebar-text hidden opacity-0 font-bold'>Çıkış</span>
         </a>
     </div>
 </aside>

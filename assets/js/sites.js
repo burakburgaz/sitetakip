@@ -59,7 +59,12 @@ function filterSites(filter) {
 }
 
 function loadSites() {
-    $('#sitesTable').html('<div class="text-center py-12"><div class="spinner mx-auto"></div><p class="mt-4 text-gray-600">Yükleniyor...</p></div>');
+    $('#sitesTable').html(`
+        <div class="flex flex-col items-center justify-center py-24 space-y-4">
+            <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+            <p class="text-slate-400 font-medium animate-pulse">Siteler yükleniyor...</p>
+        </div>
+    `);
 
     $.get('api/sites.php', {
         action: 'list',
@@ -74,135 +79,188 @@ function loadSites() {
 
 function renderSitesTable(sites) {
     if (sites.length === 0) {
-        $('#sitesTable').html('<div class="text-center py-12 text-gray-500"><i class="fa-solid fa-globe fa-3x mb-4"></i><p>Site bulunamadı</p></div>');
+        $('#sitesTable').html(`
+            <div class="flex flex-col items-center justify-center py-24 text-center">
+                <div class="w-20 h-20 rounded-full bg-slate-800/50 flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-globe text-slate-600 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-300 mb-2">Henüz Site Yok</h3>
+                <p class="text-slate-500 max-w-xs">Aradığınız kriterlere uygun herhangi bir kayıt bulunamadı.</p>
+            </div>
+        `);
         return;
     }
 
-    let html = '<table class="data-table sites-table"><thead><tr>';
-    html += '<th class="w-8"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>';
-    html += '<th>Site Bilgileri</th>';
-    html += '<th class="hidden md:table-cell">Müşteri</th>';
-    html += '<th class="hidden lg:table-cell">Paket</th>';
-    html += '<th class="hidden sm:table-cell">Yenileme</th>';
-    html += '<th class="hidden md:table-cell text-center">Durum</th>';
-    html += '<th class="w-10"></th>'; // Actions
-    html += '</tr></thead><tbody>';
+    let html = `
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-white/5 bg-white/[0.02]">
+                    <th class="px-6 py-4 w-12 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" 
+                        class="w-4 h-4 rounded border-white/10 bg-white/5 text-blue-600 focus:ring-offset-slate-900 focus:ring-blue-500">
+                    </th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Site Bilgileri</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden md:table-cell">Müşteri</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden lg:table-cell">Paket</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:table-cell">Yenileme</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden md:table-cell text-center">Durum</th>
+                    <th class="px-6 py-4 w-20 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+    `;
 
     sites.forEach(s => {
-        // Status icon
-        let statusIcon = '';
+        // Status formatting
+        let statusConfig = {
+            icon: 'fa-circle',
+            color: 'text-slate-500',
+            bg: 'bg-slate-500/10',
+            border: 'border-slate-500/20',
+            label: 'Bilinmiyor'
+        };
+
         if (s.status === 'requested') {
-            statusIcon = '<i class="fa-solid fa-paper-plane text-blue-600" title="İstendi"></i>';
+            statusConfig = { icon: 'fa-paper-plane', color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20', label: 'İstendi' };
         } else if (s.status === 'accepted') {
-            statusIcon = '<i class="fa-solid fa-check text-green-600" title="Kabul Etti"></i>';
+            statusConfig = { icon: 'fa-check-double', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', label: 'Kabul Etti' };
         } else if (s.status === 'active') {
             if (s.last_renewed_at) {
-                statusIcon = '<i class="fa-solid fa-check-circle text-emerald-600" title="Yenilendi"></i>';
+                statusConfig = { icon: 'fa-check-circle', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', label: 'Yenilendi' };
             } else {
-                statusIcon = '<i class="fa-solid fa-circle text-green-600" title="Aktif"></i>';
+                statusConfig = { icon: 'fa-check', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', label: 'Aktif' };
             }
         } else if (s.status === 'cancelled') {
-            statusIcon = '<i class="fa-solid fa-ban text-red-600" title="İptal Edildi"></i>';
+            statusConfig = { icon: 'fa-ban', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20', label: 'İptal' };
         } else if (s.status === 'transferred') {
-            statusIcon = '<i class="fa-solid fa-exchange-alt text-indigo-600" title="Transfer Edildi"></i>';
+            statusConfig = { icon: 'fa-exchange-alt', color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20', label: 'Transfer' };
         } else if (s.status === 'expired') {
-            statusIcon = '<i class="fa-solid fa-exclamation-triangle text-orange-600" title="Süresi Doldu"></i>';
+            statusConfig = { icon: 'fa-triangle-exclamation', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', label: 'Süresi Doldu' };
         }
 
-        if (s.whatsapp_sent_at) {
-            const date = new Date(s.whatsapp_sent_at);
-            statusIcon += `<div class="text-[10px] text-gray-500 mt-1">${date.toLocaleDateString()}</div>`;
-        }
+        const statusBadge = `
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${statusConfig.bg} ${statusConfig.border} border ${statusConfig.color}" title="${statusConfig.label}">
+                <i class="fa-solid ${statusConfig.icon} text-[10px]"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">${statusConfig.label}</span>
+            </div>
+        `;
 
         // Package badge
         const packageBadge = s.package_type === 'PRO'
-            ? '<span class="package-pro text-[10px]">PRO</span>'
-            : '<span class="package-basic text-[10px]">BASIC</span>';
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">PRO</span>'
+            : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-white/5">BASIC</span>';
 
         // Days until renewal
-        const daysText = s.days_until >= 0
-            ? `${s.days_until} gün`
-            : `<span class="text-red-600">${Math.abs(s.days_until)} gün gecikmiş</span>`;
+        const daysRemaining = parseInt(s.days_until);
+        let daysColor = 'text-emerald-400';
+        if (daysRemaining <= 7) daysColor = 'text-rose-400';
+        else if (daysRemaining <= 20) daysColor = 'text-amber-400';
+
+        const daysText = daysRemaining >= 0
+            ? `<span class="${daysColor} font-bold">${daysRemaining} gün kaldı</span>`
+            : `<span class="text-rose-500 font-bold">${Math.abs(daysRemaining)} gün gecikti</span>`;
 
         // API Date Logic
         let apiExpiresInfo = '';
         if (s.api_expires_at) {
             const apiDate = new Date(s.api_expires_at);
-            apiExpiresInfo = `<span class="text-gray-400" title="Hostinger Bitiş Tarihi"> <img src="https://assets.hostinger.com/images/logo-hostinger-black.svg" class="h-2 w-auto inline opacity-50 relative -top-px"> ${apiDate.toLocaleDateString('tr-TR')}</span>`;
-
-            // Accept Button Logic - Only if API date > Renewal Date
-            if (new Date(s.api_expires_at) > new Date(s.renewal_date)) {
-                apiExpiresInfo += ` <button onclick="acceptRenewalSite(${s.id})" class="ml-1 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded border border-green-200 hover:bg-green-200 transition"><i class="fa-solid fa-check"></i></button>`;
-            }
+            apiExpiresInfo = `
+                <div class="flex items-center gap-1.5 mt-1">
+                    <div class="w-1 h-1 rounded-full bg-blue-500/50"></div>
+                    <span class="text-[10px] text-blue-400/60 font-medium" title="Hostinger Verisi">
+                        Hostinger: ${apiDate.toLocaleDateString('tr-TR')}
+                    </span>
+                    ${new Date(s.api_expires_at) > new Date(s.renewal_date) ? `
+                        <button onclick="acceptRenewalSite(${s.id})" class="ml-1 text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-all active:scale-90" title="Hostinger Tarihini Uygula">
+                            Onayla
+                        </button>
+                    ` : ''}
+                </div>
+            `;
         }
 
         // Site age
         const siteAge = calculateSiteAge(s.start_date);
-        // Only show badge if years >= 2
         const ageBadge = (siteAge && parseInt(siteAge) >= 2)
-            ? `<span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-purple-600 rounded-full ml-1" title="${siteAge} Yıllık">${siteAge}</span>`
+            ? `<div class="flex items-center justify-center w-5 h-5 text-[10px] font-black text-white bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20 ml-2" title="${siteAge} Yıllık Değerli Müşteri">
+                ${siteAge}
+               </div>`
             : '';
 
-        // Mobile-visible extra info (shown in main column on mobile)
-        const mobileInfo = `
-            <div class="mt-1 space-y-0.5 md:hidden text-xs text-gray-500">
-                <div class="flex items-center gap-1"><i class="fa-solid fa-user text-gray-400 w-4"></i> ${s.customer_name}</div>
-                <div class="flex items-center gap-1"><i class="fa-solid fa-clock text-gray-400 w-4"></i> ${formatDate(s.renewal_date)} (${daysText})</div>
-            </div>
+        html += `
+            <tr class="site-row group hover:bg-white/[0.02] transition-colors relative" data-id="${s.id}">
+                <td class="px-6 py-4 text-center">
+                    <input type="checkbox" class="site-checkbox w-4 h-4 rounded border-white/10 bg-white/5 text-blue-600 focus:ring-offset-slate-900 focus:ring-blue-500" value="${s.id}" onchange="updateBulkActions()">
+                </td>
+                <td class="px-6 py-5">
+                    <div class="flex items-center">
+                        <div class="flex flex-col">
+                            <div class="flex items-center">
+                                <a href="http://${s.domain}" target="_blank" class="text-base font-bold text-white hover:text-blue-400 transition-colors flex items-center gap-1">
+                                    ${s.domain}
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 transition-all ml-1"></i>
+                                </a>
+                                ${ageBadge}
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5 font-medium flex items-center gap-2">
+                                ${s.start_date ? `<span>Kayıt: ${formatDate(s.start_date)}</span>` : ''}
+                                ${apiExpiresInfo}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-5 hidden md:table-cell">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-slate-300">${s.customer_name}</span>
+                        ${s.customer_phone ? `<span class="text-[10px] text-slate-500 font-medium">${s.customer_phone}</span>` : ''}
+                    </div>
+                </td>
+                <td class="px-6 py-5 hidden lg:table-cell whitespace-nowrap">
+                    ${packageBadge}
+                </td>
+                <td class="px-6 py-5 hidden sm:table-cell whitespace-nowrap">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-slate-300">${formatDate(s.renewal_date)}</span>
+                        <span class="text-[11px] font-semibold">${daysText}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-5 hidden md:table-cell text-center">
+                    ${statusBadge}
+                </td>
+                <td class="px-6 py-5 text-right">
+                    <div class="relative inline-block">
+                        <button onclick="toggleActionsMenu(${s.id})" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center">
+                            <i class="fa-solid fa-ellipsis-v"></i>
+                        </button>
+                        <div id="actions-${s.id}" class="actions-menu hidden absolute right-0 mt-2 w-52 glass-card rounded-2xl shadow-2xl border border-white/10 z-[100] overflow-hidden backdrop-blur-3xl py-1">
+                            <button onclick="editSite(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center gap-3 text-slate-300 transition-all">
+                                <i class="fa-solid fa-pen-to-square text-blue-400 w-4"></i>
+                                <span class="text-sm font-semibold">Düzenle</span>
+                            </button>
+                            <button onclick="toggleReminder(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center gap-3 text-slate-300 transition-all">
+                                <i class="fa-solid fa-bell text-amber-400 w-4"></i>
+                                <span class="text-sm font-semibold">Hatırlatma</span>
+                            </button>
+                            <button onclick="sendWhatsApp(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center gap-3 text-slate-300 transition-all">
+                                <i class="fa-brands fa-whatsapp text-emerald-400 w-4"></i>
+                                <span class="text-sm font-semibold">WhatsApp</span>
+                            </button>
+                            <button onclick="openHistoryModal(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center gap-3 text-slate-300 transition-all">
+                                <i class="fa-solid fa-history text-indigo-400 w-4"></i>
+                                <span class="text-sm font-semibold">Geçmiş</span>
+                            </button>
+                            ${(currentFilter === 'cancelled' || currentFilter === 'transferred') ? `
+                                <div class="my-1 border-t border-white/5"></div>
+                                <button onclick="deleteSite(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-3 hover:bg-rose-500/10 flex items-center gap-3 text-rose-400 transition-all">
+                                    <i class="fa-solid fa-trash w-4"></i>
+                                    <span class="text-sm font-bold">Sil</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </td>
+            </tr>
         `;
-
-        html += `<tr class="site-row hover:bg-gray-50 transition-colors" data-id="${s.id}">`;
-        html += `<td class="w-8"><input type="checkbox" class="site-checkbox hidden" value="${s.id}" onchange="updateBulkActions()"></td>`;
-        html += `<td>
-            <div class="flex flex-col">
-                <div class="flex items-center flex-wrap gap-1">
-                    <a href="http://${s.domain}" target="_blank" class="text-sm md:text-lg font-bold text-indigo-600 hover:text-indigo-700 truncate max-w-[150px] sm:max-w-none" title="Siteyi Ziyaret Et">
-                        ${s.domain}
-                    </a>
-                    ${ageBadge}
-                </div>
-                <!-- Mobile only extra details -->
-                ${mobileInfo}
-                <!-- API Info & Start Date (Desktop/Mobile unified mostly) -->
-                <div class="text-[10px] md:text-xs text-gray-400 mt-0.5 flex items-center flex-wrap gap-1">
-                   ${s.start_date ? `<span>Açılış: ${formatDate(s.start_date)}</span>` : ''}
-                   ${apiExpiresInfo ? `<span class="hidden sm:inline">|</span> ${apiExpiresInfo}` : ''}
-                </div>
-            </div>
-        </td>`;
-
-        // Hide these columns on mobile
-        html += `<td class="hidden md:table-cell text-sm text-gray-700"><strong>${s.customer_name}</strong></td>`;
-        html += `<td class="hidden lg:table-cell">${packageBadge}</td>`;
-        html += `<td class="hidden sm:table-cell text-xs">${formatDate(s.renewal_date)}<br><span class="text-xs md:text-sm text-gray-500 font-medium">${daysText}</span></td>`;
-        html += `<td class="hidden md:table-cell text-center">${statusIcon}</td>`;
-
-        html += `<td class="text-right p-2">
-            <div class="relative inline-block">
-                <button onclick="toggleActionsMenu(${s.id})" class="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">
-                    <i class="fa-solid fa-ellipsis-v"></i>
-                </button>
-            <div id="actions-${s.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                <button onclick="editSite(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                    <i class="fa-solid fa-pen-to-square mr-2"></i> Düzenle
-                </button>
-                <button onclick="toggleReminder(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                    <i class="fa-solid fa-bell mr-2"></i> Hatırlatma
-                </button>
-                <button onclick="sendWhatsApp(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                    <i class="fa-brands fa-whatsapp mr-2"></i> WhatsApp Gönder
-                </button>
-                <button onclick="openHistoryModal(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
-                    <i class="fa-solid fa-history mr-2"></i> Geçmiş
-                </button>
-                ${(currentFilter === 'cancelled' || currentFilter === 'transferred') ? `
-                    <button onclick="deleteSite(${s.id}); toggleActionsMenu(${s.id});" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 text-sm">
-                        <i class="fa-solid fa-trash mr-2"></i> Sil
-                    </button>
-                    ` : ''}
-            </div>
-        </div>
-        </td ></tr > `;
     });
 
     html += '</tbody></table>';
@@ -228,7 +286,7 @@ function formatDate(dateStr) {
 }
 
 function toggleActionsMenu(siteId) {
-    const menu = $(`#actions - ${siteId} `);
+    const menu = $(`#actions-${siteId}`);
     $('.actions-menu').not(menu).addClass('hidden'); // Close others
     menu.toggleClass('hidden');
 }
@@ -270,27 +328,48 @@ function showBulkActionsMenu() {
     Swal.fire({
         title: `${selectedSites.length} Site Seçildi`,
         html: `
-            < div class="space-y-2" >
-                <button onclick="bulkRenew()" class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                    <i class="fa-solid fa-sync mr-2"></i>Toplu Yenile
+            <div class="grid grid-cols-1 gap-3 mt-4">
+                <button onclick="bulkRenew()" class="flex items-center gap-3 px-5 py-3.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all font-bold group">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-600/20 transition-all">
+                        <i class="fa-solid fa-sync"></i>
+                    </div>
+                    <span>Yenileme Tarihini +1 Yıl Uzat</span>
                 </button>
-                <button onclick="bulkChangeStatus('cancelled')" class="w-full px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
-                    <i class="fa-solid fa-ban mr-2"></i>İptal Et
+                <button onclick="bulkWhatsApp()" class="flex items-center gap-3 px-5 py-3.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-2xl hover:bg-blue-500 hover:text-white transition-all font-bold group">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-600/20 transition-all">
+                        <i class="fa-brands fa-whatsapp font-bold"></i>
+                    </div>
+                    <span>Toplu WhatsApp Mesajı Gönder</span>
                 </button>
-                <button onclick="bulkChangeStatus('transferred')" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    <i class="fa-solid fa-exchange-alt mr-2"></i>Transfer Et
+                <button onclick="bulkChangeStatus('cancelled')" class="flex items-center gap-3 px-5 py-3.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-2xl hover:bg-rose-500 hover:text-white transition-all font-bold group">
+                    <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center group-hover:bg-rose-600/20 transition-all">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+                    <span>Seçilenleri İptal Et</span>
                 </button>
-                <button onclick="bulkWhatsApp()" class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                    <i class="fa-brands fa-whatsapp mr-2"></i>Toplu WhatsApp Mesajı
+                <button onclick="bulkChangeStatus('transferred')" class="flex items-center gap-3 px-5 py-3.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-2xl hover:bg-indigo-500 hover:text-white transition-all font-bold group">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-600/20 transition-all">
+                        <i class="fa-solid fa-exchange-alt"></i>
+                    </div>
+                    <span>Seçilenleri Transfer Et</span>
                 </button>
-                <button onclick="bulkDelete()" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                    <i class="fa-solid fa-trash mr-2"></i>Toplu Sil
+                <button onclick="bulkDelete()" class="flex items-center gap-3 px-5 py-3.5 bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-2xl hover:bg-rose-600 hover:text-white transition-all font-bold group">
+                    <div class="w-8 h-8 rounded-lg bg-slate-500/10 flex items-center justify-center group-hover:bg-rose-600/20 transition-all">
+                        <i class="fa-solid fa-trash"></i>
+                    </div>
+                    <span>Seçilenleri Kalıcı Olarak Sil</span>
                 </button>
-            </div >
-            `,
+            </div>
+        `,
         showConfirmButton: false,
         showCancelButton: true,
-        cancelButtonText: 'Kapat'
+        cancelButtonText: 'Kapat',
+        customClass: {
+            popup: 'glass-card border-white/10 rounded-3xl',
+            title: 'font-["Outfit"] text-white',
+            htmlContainer: 'text-slate-400',
+            cancelButton: 'bg-white/5 text-slate-300 rounded-xl hover:bg-white/10'
+        }
     });
 }
 
