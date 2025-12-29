@@ -24,7 +24,7 @@ try {
     } catch (Exception $ex) {
     }
 }
-
+//deneme
 // Auto-Migration for active/passive users
 try {
     $pdo->query("SELECT is_active FROM users LIMIT 1");
