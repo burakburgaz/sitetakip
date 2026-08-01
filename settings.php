@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Settings Page - Tabbed Interface
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
@@ -9,8 +9,8 @@ $page_title = 'Ayarlar - DReklam';
 
 <style>
     :root {
-        --tab-active: #3b82f6;
-        --tab-inactive: #64748b;
+        --tab-active: #4f46e5;
+        --tab-inactive: #475569;
     }
 
     .tab-btn {
@@ -36,49 +36,50 @@ $page_title = 'Ayarlar - DReklam';
     }
 
     .tab-btn:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #f8fafc !important;
+        background: rgba(0, 0, 0, 0.05) !important;
+        color: #0f172a !important;
         transform: translateY(-2px);
     }
 
     .tab-btn.active {
         color: var(--tab-active) !important;
-        background: rgba(59, 130, 246, 0.1) !important;
+        background: rgba(79, 70, 229, 0.1) !important;
     }
 
     .input-premium {
-        background: rgba(15, 23, 42, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        color: #0f172a !important;
         border-radius: 1rem !important;
         transition: all 0.3s ease !important;
     }
 
     .input-premium:focus {
         border-color: var(--tab-active) !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
-        background: rgba(15, 23, 42, 0.8) !important;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important;
+        background: #ffffff !important;
     }
 
     .table-premium thead th {
-        background: rgba(255, 255, 255, 0.02) !important;
+        background: rgba(0, 0, 0, 0.03) !important;
         text-transform: uppercase !important;
         letter-spacing: 0.1em !important;
         font-size: 0.7rem !important;
         font-weight: 800 !important;
-        color: #64748b !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        color: #475569 !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
         padding: 1.25rem 1rem !important;
     }
 
     .table-premium tbody td {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
         padding: 1.25rem 1rem !important;
         vertical-align: middle !important;
+        color: #0f172a !important;
     }
 
     .table-premium tr:hover {
-        background: rgba(255, 255, 255, 0.01) !important;
+        background: rgba(0, 0, 0, 0.02) !important;
     }
 
     .btn-gradient-indigo {

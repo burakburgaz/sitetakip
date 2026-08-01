@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // includes/sidebar.php - Yan menü
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 ?>
@@ -13,11 +13,11 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
 <style>
     :root {
-        --sidebar-bg: rgba(15, 23, 42, 0.7);
-        --sidebar-border: rgba(255, 255, 255, 0.1);
-        --sidebar-hover: rgba(255, 255, 255, 0.08);
-        --sidebar-active: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        --primary: #3b82f6;
+        --sidebar-bg: rgba(255, 255, 255, 0.85);
+        --sidebar-border: rgba(0, 0, 0, 0.08);
+        --sidebar-hover: rgba(0, 0, 0, 0.04);
+        --sidebar-active: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        --primary: #4f46e5;
     }
 
     #sidebar {
@@ -36,14 +36,15 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
     .sidebar-item:hover {
         background: var(--sidebar-hover) !important;
-        border-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(0, 0, 0, 0.05);
         transform: translateX(4px);
     }
 
     .sidebar-item.active {
         background: var(--sidebar-active) !important;
-        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4) !important;
-        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4) !important;
+        border-color: rgba(0, 0, 0, 0.1);
+        color: white !important;
     }
 
     .sidebar-text {
@@ -57,25 +58,25 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     }
 
     #notificationBtn {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(0, 0, 0, 0.02) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
         transition: all 0.3s ease;
     }
 
     #notificationBtn:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
+        background: rgba(0, 0, 0, 0.05) !important;
+        border-color: rgba(0, 0, 0, 0.1) !important;
     }
 
     #toggleSidebar,
     #logoutBtn {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(0, 0, 0, 0.02) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
         transition: all 0.3s ease;
     }
 
     #toggleSidebar:hover {
-        background: rgba(59, 130, 246, 0.1) !important;
+        background: rgba(79, 70, 229, 0.1) !important;
         color: var(--primary) !important;
     }
 
@@ -240,20 +241,20 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
 <!-- Notification Modal -->
 <div id="notificationModal"
-    class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-[2000] flex justify-center items-start pt-24 transition-all duration-300">
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[2000] flex justify-center items-start pt-24 transition-all duration-300">
     <div
-        class="glass-card w-full max-w-md mx-4 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden animate-fade-in-down">
+        class="glass-card w-full max-w-md mx-4 rounded-3xl border border-black/5 shadow-2xl relative overflow-hidden animate-fade-in-down">
         <!-- Header -->
-        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-            <h3 class="font-bold text-white flex items-center gap-3 logo-font tracking-wide">
+        <div class="p-6 border-b border-black/5 flex justify-between items-center bg-black/5">
+            <h3 class="font-bold text-slate-800 flex items-center gap-3 logo-font tracking-wide">
                 <div
                     class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                    <i class="fa-solid fa-clock text-indigo-400"></i>
+                    <i class="fa-solid fa-clock text-indigo-600"></i>
                 </div>
                 Bekleyen İşlemler
             </h3>
             <button onclick="toggleNotifications()"
-                class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all border border-white/5 hover:border-white/20">
+                class="w-8 h-8 rounded-lg bg-black/5 hover:bg-black/10 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-all border border-black/5 hover:border-black/10">
                 <i class="fa-solid fa-times"></i>
             </button>
         </div>
@@ -269,9 +270,9 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
         </div>
 
         <!-- Footer -->
-        <div class="p-4 border-t border-white/10 bg-black/20 text-center backdrop-blur-md">
+        <div class="p-4 border-t border-black/5 bg-white/80 text-center backdrop-blur-md">
             <a href="settings.php"
-                class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors py-2 px-4 rounded-xl hover:bg-indigo-500/10 border border-transparent hover:border-indigo-500/20">
+                class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-600 hover:text-indigo-700 transition-colors py-2 px-4 rounded-xl hover:bg-indigo-500/10 border border-transparent hover:border-indigo-500/20">
                 <span>Tümünü Yönet</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </a>

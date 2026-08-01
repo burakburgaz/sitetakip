@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/functions.php';
@@ -23,70 +23,12 @@ $page_title = 'Siteler - DReklam';
         --glass-hover: rgba(255, 255, 255, 0.06);
     }
 
-    body {
-        background-color: var(--bg-dark) !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-        color: #f8fafc;
-    }
 
-    .bg-blobs {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        overflow: hidden;
-        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-        pointer-events: none;
-    }
-
-    .blob {
-        position: absolute;
-        width: 600px;
-        height: 600px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-        filter: blur(80px);
-        border-radius: 50%;
-        animation: move 25s infinite alternate;
-    }
-
-    .blob-1 {
-        top: -100px;
-        left: -100px;
-        animation-delay: 0s;
-    }
-
-    .blob-2 {
-        bottom: -100px;
-        right: -200px;
-        animation-delay: -5s;
-        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-    }
-
-    .blob-3 {
-        top: 30%;
-        right: 10%;
-        animation-delay: -10s;
-        width: 400px;
-        height: 400px;
-        background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
-    }
-
-    @keyframes move {
-        from {
-            transform: translate(0, 0) rotate(0deg);
-        }
-
-        to {
-            transform: translate(100px, 100px) rotate(90deg);
-        }
-    }
 
     .glass-header {
-        background: rgba(15, 23, 42, 0.4) !important;
+        background: rgba(255, 255, 255, 0.8) !important;
         backdrop-filter: blur(10px) !important;
-        border-bottom: 1px solid var(--glass-border) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
     }
 
     .logo-font {

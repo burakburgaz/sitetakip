@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/functions.php';
@@ -350,11 +350,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --bg-dark: #0f172a;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --bg-light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --text-main: #0f172a;
         }
 
         * {
@@ -364,9 +365,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-light);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #f8fafc;
+            color: var(--text-main);
             overflow: hidden;
         }
 
@@ -378,22 +379,22 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
             height: 100%;
             z-index: -1;
             overflow: hidden;
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%);
         }
 
         .blob {
             position: absolute;
             width: 500px;
             height: 500px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 51, 234, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
             filter: blur(80px);
             border-radius: 50%;
             animation: move 20s infinite alternate;
         }
 
         .blob-1 { top: -100px; left: -100px; animation-delay: 0s; }
-        .blob-2 { bottom: -100px; right: -100px; animation-delay: -5s; background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(34, 197, 94, 0.2) 100%); }
-        .blob-3 { top: 40%; left: 60%; animation-delay: -10s; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%); }
+        .blob-2 { bottom: -100px; right: -100px; animation-delay: -5s; background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%); }
+        .blob-3 { top: 40%; left: 60%; animation-delay: -10s; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); }
 
         @keyframes move {
             from { transform: translate(0, 0) rotate(0deg) scale(1); }
@@ -405,20 +406,20 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
 
         .input-glass {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text-main);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .input-glass:focus {
-            background: rgba(255, 255, 255, 0.08);
+            background: #ffffff;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
             outline: none;
         }
 
@@ -480,15 +481,15 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
                     <i class="fa-solid fa-rocket text-blue-400 text-4xl"></i>
                 </div>
             </div>
-            <h1 class="text-5xl font-bold logo-font text-white mb-3 stagger-2 opacity-0 animate-up" style="animation-fill-mode: forwards;">
+            <h1 class="text-5xl font-bold logo-font text-slate-800 mb-3 stagger-2 opacity-0 animate-up" style="animation-fill-mode: forwards;">
                 DReklam
             </h1>
-            <p class="text-blue-200/60 font-medium tracking-widest uppercase text-xs stagger-3 opacity-0 animate-up" style="animation-fill-mode: forwards;">
+            <p class="text-indigo-600/80 font-bold tracking-widest uppercase text-xs stagger-3 opacity-0 animate-up" style="animation-fill-mode: forwards;">
                 Site Takip Yönetimi
             </p>
         </div>
 
-        <div class="glass-card rounded-[2.5rem] p-10 stagger-3 opacity-0 animate-up shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]" style="animation-fill-mode: forwards;">
+        <div class="glass-card rounded-[2.5rem] p-10 stagger-3 opacity-0 animate-up shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)]" style="animation-fill-mode: forwards;">
             <?php if ($error): ?>
                 <div class="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 text-sm">
                     <i class="fa-solid fa-circle-exclamation text-lg"></i>
@@ -509,18 +510,18 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
                         <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-500/10 rounded-2xl mb-4 border border-emerald-500/20">
                             <i class="fa-brands fa-whatsapp text-emerald-400 text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Güvenlik Doğrulaması</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed px-4">
-                            <span class="text-emerald-400 font-semibold"><?= $masked_phone ?></span> numaralı WhatsApp ve kayıtlı E-posta adresinize gönderilen 6 haneli kodu giriniz.
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Güvenlik Doğrulaması</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed px-4">
+                            <span class="text-emerald-600 font-semibold"><?= $masked_phone ?></span> numaralı WhatsApp ve kayıtlı E-posta adresinize gönderilen 6 haneli kodu giriniz.
                         </p>
                     </div>
 
                     <div class="relative">
                         <input type="text" name="2fa_code" required autofocus autocomplete="off"
-                            class="w-full px-6 py-5 input-glass rounded-2xl text-center text-3xl tracking-[0.5em] font-bold placeholder:text-slate-700"
+                            class="w-full px-6 py-5 input-glass rounded-2xl text-center text-3xl tracking-[0.5em] font-bold placeholder:text-slate-400"
                             placeholder="000000" maxlength="6">
                         <div class="absolute -bottom-6 left-0 right-0 text-center">
-                             <div id="countdown" class="text-[10px] text-slate-500 uppercase tracking-widest">Yeni kod için bekleyin: <span id="timer" class="text-slate-300">60</span>s</div>
+                             <div id="countdown" class="text-[10px] text-slate-500 uppercase tracking-widest">Yeni kod için bekleyin: <span id="timer" class="text-slate-800 font-bold">60</span>s</div>
                         </div>
                     </div>
 
