@@ -110,7 +110,8 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             <div class='sidebar-text hidden opacity-0 flex-1 min-w-0'>
                 <p class='font-bold text-sm truncate'><?= htmlspecialchars($_SESSION['name_surname']) ?></p>
                 <p class='text-[10px] text-slate-400 uppercase font-black tracking-tighter'>
-                    <?= ucfirst($_SESSION['role']) ?></p>
+                    <?= ucfirst($_SESSION['role']) ?>
+                </p>
             </div>
         </div>
     </div>
@@ -239,24 +240,41 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
 <!-- Notification Modal -->
 <div id="notificationModal"
-    class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-[2000] flex justify-center items-start pt-20">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-fade-in-down">
-        <div class="bg-indigo-600 p-4 flex justify-between items-center text-white">
-            <h3 class="font-bold flex items-center gap-2">
-                <i class="fa-solid fa-clock"></i> Bekleyen İşlemler
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-[2000] flex justify-center items-start pt-24 transition-all duration-300">
+    <div
+        class="glass-card w-full max-w-md mx-4 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden animate-fade-in-down">
+        <!-- Header -->
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+            <h3 class="font-bold text-white flex items-center gap-3 logo-font tracking-wide">
+                <div
+                    class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+                    <i class="fa-solid fa-clock text-indigo-400"></i>
+                </div>
+                Bekleyen İşlemler
             </h3>
-            <button onclick="toggleNotifications()" class="hover:text-gray-200"><i
-                    class="fa-solid fa-times"></i></button>
+            <button onclick="toggleNotifications()"
+                class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all border border-white/5 hover:border-white/20">
+                <i class="fa-solid fa-times"></i>
+            </button>
         </div>
-        <div class="max-h-[60vh] overflow-y-auto p-0" id="notificationList">
-            <!-- Content -->
-            <div class="p-8 text-center text-gray-500">
-                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>Yükleniyor...</p>
+
+        <!-- Content Area -->
+        <div class="max-h-[60vh] overflow-y-auto custom-scrollbar p-2" id="notificationList">
+            <!-- Loading State -->
+            <div class="p-12 text-center text-slate-500 flex flex-col items-center">
+                <div class="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4">
+                </div>
+                <p class="text-sm font-medium animate-pulse">İşlemler yükleniyor...</p>
             </div>
         </div>
-        <div class="p-3 bg-gray-50 border-t text-center">
-            <a href="settings.php" class="text-sm text-indigo-600 font-medium hover:underline">Tümünü Yönet</a>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-white/10 bg-black/20 text-center backdrop-blur-md">
+            <a href="settings.php"
+                class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors py-2 px-4 rounded-xl hover:bg-indigo-500/10 border border-transparent hover:border-indigo-500/20">
+                <span>Tümünü Yönet</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>
@@ -344,31 +362,32 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
         const pendingJobs = jobs.filter(j => j.status === 'pending');
 
         if (pendingJobs.length === 0) {
-            list.innerHTML = '<div class="p-8 text-center text-gray-500"><i class="fa-regular fa-check-circle text-4xl mb-2 text-green-500"></i><p>Bekleyen işlem yok!</p></div>';
+            list.innerHTML = '<div class="p-12 text-center text-slate-500 flex flex-col items-center"><div class="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4"><i class="fa-regular fa-check-circle text-2xl text-emerald-400"></i></div><p class="font-bold text-sm uppercase tracking-widest opacity-70">Bekleyen işlem yok</p></div>';
             return;
         }
 
-        let html = '<div class="divide-y divide-gray-100">';
+        let html = '<div class="space-y-1">';
         pendingJobs.forEach(job => {
             let jobData = {};
             try { jobData = JSON.parse(job.job_data || '{}'); } catch (e) { }
 
             let icon = 'fa-clock';
-            let color = 'text-gray-500';
-            let bgClass = 'bg-white';
+            let color = 'text-slate-400';
 
-            if (job.job_type.includes('whatsapp')) { icon = 'fa-brands fa-whatsapp'; color = 'text-green-600'; }
-            if (job.job_type.includes('mail')) { icon = 'fa-envelope'; color = 'text-blue-600'; }
-            if (job.job_type.includes('backup')) { icon = 'fa-database'; color = 'text-red-600'; }
+            if (job.job_type.includes('whatsapp')) { icon = 'fa-brands fa-whatsapp'; color = 'text-emerald-400'; }
+            if (job.job_type.includes('mail')) { icon = 'fa-envelope'; color = 'text-blue-400'; }
+            if (job.job_type.includes('backup')) { icon = 'fa-database'; color = 'text-rose-400'; }
 
             html += `
-                <div class="p-4 hover:bg-gray-50 transition flex gap-3 items-start">
-                    <div class="mt-1 ${color}"><i class="${icon}"></i></div>
-                    <div class="flex-1">
-                        <h4 class="text-sm font-semibold text-gray-800">${job.job_name}</h4>
-                        <p class="text-xs text-gray-500 mt-1">${jobData.site_domain || ''} ${jobData.note ? '- ' + jobData.note : ''}</p>
-                        <div class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-                            <i class="fa-regular fa-calendar"></i> ${job.scheduled_date} ${job.scheduled_time}
+                <div class="p-4 hover:bg-white/5 transition-all rounded-xl border border-transparent hover:border-white/5 flex gap-4 items-start group">
+                    <div class="mt-0.5 w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-white/10 transition-colors shrink-0">
+                        <i class="${icon} ${color} text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-bold text-white leading-tight mb-1 group-hover:text-indigo-300 transition-colors">${job.job_name}</h4>
+                        <p class="text-xs text-slate-400 font-medium truncate">${jobData.site_domain || ''} ${jobData.note ? `<span class="opacity-50 mx-1">|</span> ${jobData.note}` : ''}</p>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-2 flex items-center gap-1.5 opacity-70">
+                            <i class="fa-regular fa-calendar"></i> ${job.scheduled_date} <span class="w-0.5 h-0.5 bg-slate-500 rounded-full"></span> ${job.scheduled_time}
                         </div>
                     </div>
                 </div>

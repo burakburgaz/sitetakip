@@ -888,33 +888,185 @@ try {
     }
 
     // 11. GET UNREAD CHATS (For floating widget)
+    // 11. GET UNREAD CHATS (For floating widget)
     if ($action === 'get_unread_chats') {
-        // Get contacts with unread messages
+        // Prevent session locking for long polling
+        session_write_close();
+
+        // 1. Actively poll API for unread chats to ensure real-time data
+        $config = getEvolutionConfig($pdo);
+        if ($config) {
+            // Find chats with unread messages
+            // Using 'where' filter for unreadCount > 0 is not always reliable in Evolution v2 depending on the adapter,
+            // so we fetch recent chats and filter by unreadCount in PHP.
+            // Dynamic limit: polling (10) vs full check (15)
+            // We use 15 for 'check_all' because we will make aggressive API calls for each (N+1).
+            // 100 would be too slow. 15 covers the widget view.
+            $limit = isset($_REQUEST['check_all']) && $_REQUEST['check_all'] == 1 ? 15 : 10;
+            $isForceCheck = isset($_REQUEST['check_all']) && $_REQUEST['check_all'] == 1;
+
+            $payload = [
+                "limit" => $limit,
+                "page" => 1
+            ];
+
+            $res = callEvolutionApi('chat/findChats', 'POST', $payload, $config);
+
+            if (($res['code'] === 200 || $res['code'] === 201) && isset($res['body'])) {
+                $data = $res['body'];
+                $records = $data['records'] ?? ($data['data'] ?? $data);
+
+                if (is_array($records)) {
+                    // Optimization: Batch fetch local timestamps for found JIDs
+                    $jids = [];
+                    foreach ($records as $r) {
+                        $jid = $r['id'] ?? $r['remoteJid'] ?? '';
+                        if ($jid)
+                            $jids[] = $jid;
+                    }
+
+                    $dbTimestamps = [];
+                    if (!empty($jids)) {
+                        $placeholders = implode(',', array_fill(0, count($jids), '?'));
+                        $stmtTs = $pdo->prepare("SELECT jid, last_message_time FROM whatsapp_contacts WHERE jid IN ($placeholders)");
+                        $stmtTs->execute($jids);
+                        while ($row = $stmtTs->fetch(PDO::FETCH_ASSOC)) {
+                            $dbTimestamps[$row['jid']] = strtotime($row['last_message_time']);
+                        }
+                    }
+
+                    foreach ($records as $chat) {
+                        // Normalize IDs
+                        $jid = $chat['id'] ?? $chat['remoteJid'] ?? '';
+                        if (!$jid)
+                            continue;
+
+                        $apiTs = $chat['messageTimestamp'] ?? $chat['conversationTimestamp'] ?? 0;
+                        if ($apiTs > 2000000000)
+                            $apiTs = $apiTs / 1000; // Handle conversions if needed
+
+                        $dbTs = $dbTimestamps[$jid] ?? 0;
+
+                        // If API has newer activity OR unread count > 0, fetch messages
+                        $unread = $chat['unreadCount'] ?? 0;
+
+                        // SYNC LOGIC:
+                        // 1. If Force Check (Widget Open) -> ALWAYS Sync top chats
+                        // 2. If Polling -> Only Sync if API is newer or Unread > 0
+
+                        if ($isForceCheck || $apiTs > $dbTs || $unread > 0) {
+
+                            // 1. Update Contact Info
+                            $name = $chat['pushName'] ?? $chat['name'] ?? 'Bilinmiyor';
+                            $isGroup = strpos($jid, '@g.us') !== false;
+                            $type = 'individual';
+                            if ($isGroup) {
+                                $type = 'group';
+                            } else if (strpos($jid, '@s.whatsapp.net') !== false) {
+                                $type = 'status';
+                            }
+                            $number = explode('@', $jid)[0];
+                            $groupName = $isGroup ? $name : '';
+
+                            $upsert = $pdo->prepare("
+                                INSERT OR REPLACE INTO whatsapp_contacts
+                                (jid, name, group_name, number, type, last_message_time, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                            ");
+                            $upsert->execute([$jid, $name, $groupName, $number, $type, date('Y-m-d H:i:s', $apiTs)]);
+
+                            // 2. Fetch Messages (Robust Sync)
+                            // We fetch the last 3 messages to sure we have the latest one for preview.
+                            $msgRes = callEvolutionApi('chat/findMessages', 'POST', [
+                                "where" => [
+                                    "key" => ["remoteJid" => $jid]
+                                ],
+                                "limit" => 3,
+                                "page" => 1
+                            ], $config);
+
+                            if (isset($msgRes['body']['messages']['records'])) {
+                                $msgs = $msgRes['body']['messages']['records'];
+                                foreach ($msgs as $m) {
+                                    $keyData = $m['key'] ?? [];
+                                    $msgId = $keyData['id'] ?? uniqid();
+                                    $fromMe = $keyData['fromMe'] ?? false;
+
+                                    $msgContent = $m['message'] ?? [];
+
+                                    // Content Extraction logic
+                                    $content = '';
+                                    $msgType = 'unknown';
+
+                                    if (isset($msgContent['conversation'])) {
+                                        $content = $msgContent['conversation'];
+                                        $msgType = 'text';
+                                    } elseif (isset($msgContent['extendedTextMessage'])) {
+                                        $content = $msgContent['extendedTextMessage']['text'] ?? '';
+                                        $msgType = 'text';
+                                    } elseif (isset($msgContent['imageMessage'])) {
+                                        $content = '[Görsel]';
+                                        $msgType = 'image';
+                                    } elseif (isset($msgContent['videoMessage'])) {
+                                        $content = '[Video]';
+                                        $msgType = 'video';
+                                    } elseif (isset($msgContent['audioMessage'])) {
+                                        $content = '[Ses]';
+                                        $msgType = 'audio';
+                                    } else {
+                                        $content = '[Medya/Diğer]';
+                                        $msgType = 'other';
+                                    }
+
+                                    // Fix timestamp if ms
+                                    $timestamp = $m['messageTimestamp'] ?? time();
+                                    if ($timestamp > 2000000000)
+                                        $timestamp /= 1000;
+
+                                    $stmt = $pdo->prepare("INSERT OR IGNORE INTO whatsapp_messages (remote_jid, message_id, from_me, push_name, content, message_type, timestamp, is_read, raw_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                    $stmt->execute([
+                                        $jid,
+                                        $msgId,
+                                        $fromMe ? 1 : 0,
+                                        $m['pushName'] ?? '',
+                                        $content,
+                                        $msgType,
+                                        $timestamp,
+                                        0, // is_read = 0 (logic handles mark as read separately)
+                                        json_encode($m)
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         $sql = "SELECT 
-                    c.jid,
+                    m.remote_jid as jid,
                     c.name,
                     c.group_name,
                     c.type,
-                    c.last_message_time,
-                    COUNT(CASE WHEN m.from_me = 0 AND m.is_read = 0 THEN 1 END) as unread_count,
-                    (SELECT content FROM whatsapp_messages 
-                     WHERE remote_jid = c.jid 
-                     ORDER BY timestamp DESC LIMIT 1) as last_message
-                FROM whatsapp_contacts c
-                LEFT JOIN whatsapp_messages m ON c.jid = m.remote_jid
-                GROUP BY c.jid
-                HAVING unread_count > 0
-                ORDER BY c.last_message_time DESC
-                LIMIT 10";
+                    datetime(MAX(m.timestamp), 'unixepoch', 'localtime') as last_message_time,
+                    SUM(CASE WHEN m.from_me = 0 AND m.is_read = 0 THEN 1 ELSE 0 END) as unread_count,
+                    (SELECT content FROM whatsapp_messages m2 
+                     WHERE m2.remote_jid = m.remote_jid 
+                     ORDER BY m2.timestamp DESC LIMIT 1) as last_message
+                FROM whatsapp_messages m
+                LEFT JOIN whatsapp_contacts c ON m.remote_jid = c.jid
+                GROUP BY m.remote_jid
+                ORDER BY last_message_time DESC
+                LIMIT $limit";
 
         $stmt = $pdo->query($sql);
-        $chats = $stmt->fetchAll();
+        $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Calculate total unread
-        $totalUnread = 0;
+        // Calculate total unread (global count)
+        $totalUnread = $pdo->query("SELECT COUNT(*) FROM whatsapp_messages WHERE from_me = 0 AND is_read = 0")->fetchColumn();
+
         foreach ($chats as &$chat) {
             $chat['name'] = $chat['type'] === 'group' ? ($chat['group_name'] ?: $chat['name']) : $chat['name'];
-            $totalUnread += $chat['unread_count'];
         }
 
         json_response([

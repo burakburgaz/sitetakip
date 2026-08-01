@@ -526,7 +526,7 @@ function loadAvailableSites() {
 }
 
 function updateSelectedSitesDisplay() {
-    $('#customerSitesHidden').val(JSON.stringify(customerSiteIds));
+    $('#customerSitesHidden').val(customerSiteIds.join(','));
 
     if (customerSiteIds.length === 0) {
         $('#selectedSitesTags').html(`
@@ -586,9 +586,9 @@ function openWhatsappModal(customerId) {
 
         const hasEvolution = settings.evolution_api_url && settings.evolution_api_key && settings.evolution_instance_name;
 
-        let optionsHtml = '<option value="">Şablon Seçiniz...</option>';
+        let optionsHtml = '<option class="bg-slate-800 text-white" value="">Şablon Seçiniz...</option>';
         templates.filter(t => t.type === 'whatsapp').forEach(t => {
-            optionsHtml += `<option value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
+            optionsHtml += `<option class="bg-slate-800 text-white" value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
         });
 
         let sitesHtml = '';
@@ -621,7 +621,7 @@ function openWhatsappModal(customerId) {
                     ${sitesHtml}
                     <div>
                         <label class="block text-sm font-semibold mb-2">Mesaj Şablonu</label>
-                        <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-gray-50">${optionsHtml}</select>
+                        <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-slate-800 text-white border-white/10">${optionsHtml}</select>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-2">Mesaj</label>
@@ -643,7 +643,7 @@ function openWhatsappModal(customerId) {
                     </div>
                     ` : ''}
 
-                    ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : '<p class="text-xs text-green-600 bg-green-50 p-2 rounded mt-2">API ayarlı. Mesaj otomatik gönderilecek.</p>'}
+                    ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : ''}
                 </div>
             `,
             width: '600px',
@@ -718,9 +718,9 @@ function bulkWhatsApp() {
     Swal.close();
     $.get('api/templates.php', { action: 'list' }, function (res) {
         const templates = res.data || [];
-        let optionsHtml = '<option value="">Şablon Seçiniz...</option>';
+        let optionsHtml = '<option class="bg-slate-800 text-white" value="">Şablon Seçiniz...</option>';
         templates.filter(t => t.type === 'whatsapp').forEach(t => {
-            optionsHtml += `<option value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
+            optionsHtml += `<option class="bg-slate-800 text-white" value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
         });
 
         Swal.fire({
@@ -733,7 +733,7 @@ function bulkWhatsApp() {
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-2">Mesaj Şablonu</label>
-                        <select id="bulkTemplate" class="w-full border rounded px-3 py-2 bg-gray-50">${optionsHtml}</select>
+                        <select id="bulkTemplate" class="w-full border rounded px-3 py-2 bg-slate-800 text-white border-white/10">${optionsHtml}</select>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-2">Mesaj İçeriği</label>
@@ -742,7 +742,7 @@ function bulkWhatsApp() {
                     <div class="border-t pt-4 mt-2">
                          <label class="flex items-center space-x-2 cursor-pointer mb-2">
                             <input type="checkbox" id="bulkScheduleToggle" class="form-checkbox h-4 w-4 text-green-600">
-                            <span class="text-sm font-bold text-gray-700">Zamanlı Gönderim</span>
+                            <span class="text-sm font-bold text-white">Zamanlı Gönderim</span>
                          </label>
                          <div id="bulkScheduleContainer" class="hidden pl-6">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Gönderim Tarihi</label>

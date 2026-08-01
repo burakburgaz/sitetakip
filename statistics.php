@@ -222,175 +222,215 @@ $extra_stats = [
 ?>
 <?php include 'includes/head.php'; ?>
 
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 flex h-screen overflow-hidden">
+<body class="bg-gray-900 flex h-screen overflow-hidden">
+    <!-- Background Design Elements -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <?php include 'includes/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
         <!-- Header -->
-        <header class="bg-white shadow-md z-10 p-4 border-b-2 border-indigo-600">
+        <header class="z-10 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-indigo-600"></i>
+                    <h2 class="text-3xl font-bold logo-font text-white flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center border border-indigo-500/30">
+                            <i class="fa-solid fa-chart-line text-indigo-400 text-xl"></i>
+                        </div>
                         İstatistikler & Analizler
                     </h2>
-                    <p class="text-xs text-gray-600 mt-1">Aylık bazlı detaylı analiz - Tüm yıllar birleşik</p>
+                    <p class="text-slate-400 text-xs mt-1 tracking-wider uppercase">Sistem Performans Verileri ve
+                        Finansal Analizler</p>
                 </div>
-                <button onclick="window.print()"
-                    class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm">
-                    <i class="fa-solid fa-print mr-1"></i>Yazdır
-                </button>
+                <div class="flex items-center gap-4">
+                    <button onclick="window.print()"
+                        class="px-5 py-2.5 bg-white/5 border border-white/10 text-white rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2 font-bold text-sm">
+                        <i class="fa-solid fa-print text-indigo-400"></i>Yazdır
+                    </button>
+                    <div
+                        class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-slate-300">
+                        <i class="fa-solid fa-calendar-day text-indigo-400"></i>
+                        <span class="text-sm font-medium"><?= date('d.m.Y') ?></span>
+                    </div>
+                </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-auto p-4">
-            <!-- Özet Kartları -->
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-3 text-white">
-                    <p class="text-xs opacity-90">Toplam Site</p>
-                    <h3 class="text-2xl font-bold"><?= $stats['total_sites'] ?></h3>
-                    <p class="text-xs opacity-75">Aktif: <?= $stats['active_sites'] ?></p>
-                </div>
-                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-3 text-white">
-                    <p class="text-xs opacity-90">Toplam Aylık Gelir</p>
-                    <h3 class="text-xl font-bold"><?= format_currency($stats['total_revenue']) ?></h3>
-                    <p class="text-xs opacity-75">Aylık Ort: <?= format_currency($stats['avg_monthly_revenue']) ?></p>
-                </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-3 text-white">
-                    <p class="text-xs opacity-90">Ortalama Site Fiyatı</p>
-                    <h3 class="text-xl font-bold"><?= format_currency($extra_stats['avg_price']) ?></h3>
-                    <p class="text-xs opacity-75">Aylık Ort:
-                        <?= number_format($extra_stats['avg_monthly_additions'], 1) ?> site
-                    </p>
-                </div>
-                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-3 text-white">
-                    <p class="text-xs opacity-90"><?= $extra_stats['display_month'] ?> Ayı Yenilenecek</p>
-                    <h3 class="text-2xl font-bold"><?= $extra_stats['display_renewals'] ?></h3>
-                    <p class="text-xs opacity-75">Gelir: <?= format_currency($extra_stats['display_revenue']) ?></p>
-                </div>
-                <?php if ($extra_stats['next_renewals'] > 0): ?>
-                    <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md p-3 text-white">
-                        <p class="text-xs opacity-90"><?= $extra_stats['next_month_name'] ?> Ayı Yenilenecek</p>
-                        <h3 class="text-2xl font-bold"><?= $extra_stats['next_renewals'] ?></h3>
-                        <p class="text-xs opacity-75">Gelir: <?= format_currency($extra_stats['next_revenue']) ?></p>
+        <main class="flex-1 overflow-auto p-8 pt-2 custom-scrollbar">
+
+
+
+            <!-- Visualization Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                <!-- Monthly Volume -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                <i class="fa-solid fa-chart-column text-blue-500"></i>
+                                Aylık Yenileme Hacmi
+                            </h3>
+                            <p class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Aylar bazında site sayıları
+                            </p>
+                        </div>
                     </div>
-                <?php endif; ?>
-            </div>
+                    <div class="h-64">
+                        <canvas id="renewalsChart"></canvas>
+                    </div>
+                </div>
 
-            <!-- Grafikler -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-calendar-alt text-blue-600 text-xs"></i>Aylık Yenilenecek Site Sayısı
-                    </h3>
-                    <div class="h-48"><canvas id="renewalsChart"></canvas></div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-coins text-green-600 text-xs"></i>Aylık Gelecek Gelir (₺)
-                    </h3>
-                    <div class="h-48"><canvas id="revenueChart"></canvas></div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-chart-pie text-purple-600 text-xs"></i>Durum Dağılımı
-                    </h3>
-                    <div class="h-48"><canvas id="statusChart"></canvas></div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-box text-indigo-600 text-xs"></i>Paket Dağılımı
-                    </h3>
-                    <div class="h-48"><canvas id="packageChart"></canvas></div>
+                <!-- Monthly Revenue Projection -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                <i class="fa-solid fa-wave-square text-emerald-500"></i>
+                                Gelir Projeksiyonu
+                            </h3>
+                            <p class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Aylık beklenen nakit akışı
+                            </p>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <!-- AYLIK DETAYLI ANALİZ TABLOSU (12 AY - AY BAZLI) -->
-            <div class="bg-white rounded-lg shadow-md p-3 mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-table text-indigo-600"></i>
-                    Aylık Detaylı Analiz (12 Ay - Tüm Yıllar Birleşik)
-                </h3>
-                <p class="text-xs text-gray-600 mb-3">Her satır bir ayı temsil eder (hangi yıl olursa olsun). Örnek:
-                    Ocak satırında 2024 Ocak, 2025 Ocak, 2026 Ocak hepsi birleştirilmiştir.</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
-                        <thead class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-                            <tr>
-                                <th class="px-2 py-2 text-left font-semibold">Ay</th>
-                                <th class="px-2 py-2 text-center font-semibold">Aktif Site</th>
-                                <th class="px-2 py-2 text-center font-semibold">Yenilenecek</th>
-                                <th class="px-2 py-2 text-center font-semibold">Yenilendi</th>
-                                <th class="px-2 py-2 text-center font-semibold">Eklenen</th>
-                                <th class="px-2 py-2 text-center font-semibold">İptal</th>
-                                <th class="px-2 py-2 text-center font-semibold">Transfer</th>
-                                <th class="px-2 py-2 text-right font-semibold">Gelir</th>
+            <!-- Secondary Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-sm font-bold text-slate-300 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-nodes text-purple-500"></i>
+                        Site Durumları
+                    </h3>
+                    <div class="h-56">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-sm font-bold text-slate-300 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-amber-500"></i>
+                        Paket Segmentasyonu
+                    </h3>
+                    <div class="h-56">
+                        <canvas id="packageChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-sm font-bold text-slate-300 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-hourglass-half text-teal-500"></i>
+                        Hizmet Yaşı (LTV)
+                    </h3>
+                    <div class="h-56">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis Table (The Master Table) -->
+            <div class="glass-card rounded-[2.5rem] p-8 mb-10 overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <i class="fa-solid fa-table-list text-8xl text-indigo-500"></i>
+                </div>
+                <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6 relative z-10">
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                            <i class="fa-solid fa-calendar-check text-indigo-500"></i>
+                            Kümülatif Aylık Performans
+                        </h3>
+                        <p class="text-slate-500 text-xs mt-1">Yıllardan bağımsız, ay bazlı birleştirilmiş tüm veri
+                            analizi</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                        <span class="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Canlı Veri</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto relative z-10 custom-scrollbar">
+                    <table class="w-full text-xs text-left">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-white/5 uppercase tracking-tighter">
+                                <th class="px-4 py-4 font-black">Analiz Dönemi (Ay)</th>
+                                <th class="px-4 py-4 text-center font-black">Aktif Portföy</th>
+                                <th class="px-4 py-4 text-center font-black">Beklenen Yenileme</th>
+                                <th class="px-4 py-4 text-center font-black">Başarılı Yenileme</th>
+                                <th class="px-4 py-4 text-center font-black">Yeni Kazanım</th>
+                                <th class="px-4 py-4 text-center font-black">Kaybedilen (Churn)</th>
+                                <th class="px-4 py-4 text-right font-black">Brüt Gelir (₺)</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-white/5">
                             <?php
-                            $current_month = (int) date('n'); // Şu anki ay numarası (1-12)
+                            $current_month = (int) date('n');
                             foreach ($monthly_analysis as $month_data):
                                 $is_current = ($month_data['month_num'] == $current_month);
-                                $row_class = $is_current ? 'bg-indigo-100 border-l-4 border-indigo-600' : 'hover:bg-gray-50';
-                                $text_class = $is_current ? 'font-bold text-indigo-900' : 'text-gray-700';
+                                $row_class = $is_current ? 'bg-indigo-500/10 border-l-[4px] border-indigo-500' : 'hover:bg-white/[0.02] transition-colors';
                                 ?>
-                                <tr class="<?= $row_class ?> border-b border-gray-100 transition">
-                                    <td class="px-2 py-2 <?= $text_class ?>">
-                                        <?= $month_data['month'] ?>
-                                        <?php if ($is_current): ?>
+                                <tr class="<?= $row_class ?>">
+                                    <td class="px-4 py-5">
+                                        <div class="flex items-center gap-3">
                                             <span
-                                                class="ml-1 px-1.5 py-0.5 bg-indigo-600 text-white text-xs rounded-full">●</span>
-                                        <?php endif; ?>
+                                                class="text-sm font-bold <?= $is_current ? 'text-indigo-400' : 'text-slate-200' ?>"><?= $month_data['month'] ?></span>
+                                            <?php if ($is_current): ?>
+                                                <span
+                                                    class="bg-indigo-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Aktif
+                                                    Ay</span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
-                                    <td class="px-2 py-2 text-center"><span
-                                            class="text-green-700 font-semibold"><?= $month_data['active'] ?></span></td>
-                                    <td class="px-2 py-2 text-center">
+                                    <td class="px-4 py-5 text-center font-bold text-slate-300"><?= $month_data['active'] ?>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
                                         <?php if ($month_data['renewals'] > 0): ?>
                                             <span
-                                                class="px-2 py-0.5 <?= $month_data['renewals'] > 10 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' ?> rounded text-xs font-bold">
+                                                class="px-2.5 py-1 <?= $month_data['renewals'] > 10 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400' ?> rounded-lg font-black border border-current/10">
                                                 <?= $month_data['renewals'] ?>
                                             </span>
                                         <?php else: ?>
-                                            <span class="text-gray-300">-</span>
+                                            <span class="text-slate-600">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="px-2 py-2 text-center">
-                                        <?= $month_data['renewed'] > 0 ? '<span class="text-green-600 font-semibold">✓ ' . $month_data['renewed'] . '</span>' : '<span class="text-gray-300">-</span>' ?>
+                                    <td class="px-4 py-5 text-center">
+                                        <?= $month_data['renewed'] > 0 ? '<span class="text-emerald-400 font-bold flex items-center justify-center gap-1"><i class="fa-solid fa-check-double text-[8px]"></i>' . $month_data['renewed'] . '</span>' : '<span class="text-slate-600">-</span>' ?>
                                     </td>
-                                    <td class="px-2 py-2 text-center">
-                                        <?= $month_data['added'] > 0 ? '<span class="text-blue-600 font-semibold">+ ' . $month_data['added'] . '</span>' : '<span class="text-gray-300">-</span>' ?>
+                                    <td class="px-4 py-5 text-center">
+                                        <?= $month_data['added'] > 0 ? '<span class="text-blue-400 font-bold flex items-center justify-center gap-1"><i class="fa-solid fa-plus text-[8px]"></i>' . $month_data['added'] . '</span>' : '<span class="text-slate-600">-</span>' ?>
                                     </td>
-                                    <td class="px-2 py-2 text-center">
-                                        <?= $month_data['cancelled'] > 0 ? '<span class="text-red-600 font-semibold">' . $month_data['cancelled'] . '</span>' : '<span class="text-gray-300">-</span>' ?>
+                                    <td class="px-4 py-5 text-center text-red-400 font-bold">
+                                        <?= $month_data['cancelled'] > 0 ? $month_data['cancelled'] : '<span class="text-slate-600">-</span>' ?>
                                     </td>
-                                    <td class="px-2 py-2 text-center">
-                                        <?= $month_data['transferred'] > 0 ? '<span class="text-indigo-600 font-semibold">' . $month_data['transferred'] . '</span>' : '<span class="text-gray-300">-</span>' ?>
-                                    </td>
-                                    <td class="px-2 py-2 text-right">
-                                        <?= $month_data['revenue'] > 0 ? '<span class="font-bold text-green-600">' . number_format($month_data['revenue'], 0, ',', '.') . '₺</span>' : '<span class="text-gray-300">-</span>' ?>
+                                    <td class="px-4 py-5 text-right font-black text-emerald-400">
+                                        <?= $month_data['revenue'] > 0 ? number_format($month_data['revenue'], 0, ',', '.') . ' ₺' : '<span class="text-slate-600">-</span>' ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-                        <tfoot class="bg-gradient-to-r from-gray-700 to-gray-800 text-white font-bold text-xs">
+                        <tfoot class="bg-white/5 text-xs font-black uppercase tracking-widest text-slate-300">
                             <tr>
-                                <td class="px-2 py-2">TOPLAM</td>
-                                <td class="px-2 py-2 text-center"><?= $stats['active_sites'] ?></td>
-                                <td class="px-2 py-2 text-center">
+                                <td class="px-4 py-5 rounded-bl-[2rem]">GENEL TOPLAM</td>
+                                <td class="px-4 py-5 text-center"><?= $stats['active_sites'] ?></td>
+                                <td class="px-4 py-5 text-center">
                                     <?= array_sum(array_column($monthly_analysis, 'renewals')) ?>
                                 </td>
-                                <td class="px-2 py-2 text-center">
+                                <td class="px-4 py-5 text-center">
                                     <?= array_sum(array_column($monthly_analysis, 'renewed')) ?>
                                 </td>
-                                <td class="px-2 py-2 text-center">
+                                <td class="px-4 py-5 text-center">
                                     <?= array_sum(array_column($monthly_analysis, 'added')) ?>
                                 </td>
-                                <td class="px-2 py-2 text-center"><?= $stats['cancelled_sites'] ?></td>
-                                <td class="px-2 py-2 text-center"><?= $stats['transferred_sites'] ?></td>
-                                <td class="px-2 py-2 text-right">
-                                    <?= number_format($stats['total_revenue'], 0, ',', '.') ?>₺
+                                <td class="px-4 py-5 text-center text-red-400"><?= $stats['cancelled_sites'] ?></td>
+                                <td class="px-4 py-5 text-right text-emerald-400 rounded-br-[2rem]">
+                                    <?= number_format($stats['total_revenue'], 0, ',', '.') ?> ₺
                                 </td>
                             </tr>
                         </tfoot>
@@ -398,42 +438,144 @@ $extra_stats = [
                 </div>
             </div>
 
-            <!-- Ek Bilgiler -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <!-- Top Müşteriler -->
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-trophy text-yellow-600 text-xs"></i>Top 10 Müşteriler
-                    </h3>
-                    <div class="space-y-1">
+            <!-- Bottom Insights (Top Customers) -->
+            <div class="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                                <i class="fa-solid fa-medal text-amber-500"></i>
+                                Top 10 Portföy (En Değerli Müşteriler)
+                            </h3>
+                            <p class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Aktif site ve gelir bazlı
+                                sıralama</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <?php $rank = 1;
                         foreach ($top_customers as $customer): ?>
                             <div
-                                class="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-blue-50 transition">
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white text-xs flex items-center justify-center font-bold"><?= $rank++ ?></span>
-                                    <span
-                                        class="text-xs font-semibold text-gray-800"><?= htmlspecialchars($customer['full_name']) ?></span>
+                                class="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-8 h-8 rounded-xl bg-gradient-to-br <?= $rank <= 3 ? 'from-amber-400 to-orange-600' : 'from-slate-600 to-slate-800' ?> text-white text-xs flex items-center justify-center font-black shadow-lg">
+                                        <?= $rank++ ?>
+                                    </div>
+                                    <div>
+                                        <p
+                                            class="text-sm font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
+                                            <?= htmlspecialchars($customer['full_name']) ?>
+                                        </p>
+                                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                                            <?= $customer['site_count'] ?> Aktif Proje
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-bold"><?= $customer['site_count'] ?></span>
-                                    <span
-                                        class="text-xs font-bold text-green-600"><?= format_currency($customer['total_revenue']) ?></span>
+                                <div class="text-right">
+                                    <p class="text-sm font-black text-emerald-400">
+                                        <?= number_format($customer['total_revenue'], 0, ',', '.') ?> <span
+                                            class="text-[10px] font-normal">₺</span>
+                                    </p>
+                                    <p class="text-[9px] text-slate-600 font-bold">Toplam Aylık Değer</p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
-
-                <!-- Site Yaşı -->
-                <div class="bg-white rounded-lg shadow-md p-3">
-                    <h3 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1">
-                        <i class="fa-solid fa-calendar-days text-teal-600 text-xs"></i>Site Yaşı Dağılımı
-                    </h3>
-                    <div class="h-64"><canvas id="ageChart"></canvas></div>
+            </div>
+            <!-- Quick Stats Summary (Compact Design) -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8 pb-4">
+                <!-- Total Sites -->
+                <div class="glass-card p-4 rounded-xl flex items-center gap-3 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-3 -top-3 w-12 h-12 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all">
+                    </div>
+                    <div
+                        class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-globe text-blue-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-500 text-[9px] font-black uppercase tracking-wider">Toplam Site</h4>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <p class="text-lg font-black text-white"><?= $stats['total_sites'] ?></p>
+                            <span class="text-[9px] text-blue-400 font-bold">Aktif: <?= $stats['active_sites'] ?></span>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Total Revenue -->
+                <div class="glass-card p-4 rounded-xl flex items-center gap-3 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-3 -top-3 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all">
+                    </div>
+                    <div
+                        class="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20 shrink-0">
+                        <i class="fa-solid fa-lira-sign text-emerald-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-500 text-[9px] font-black uppercase tracking-wider">Toplam Gelir</h4>
+                        <p class="text-lg font-black text-white mt-0.5">
+                            <?= number_format($stats['total_revenue'], 0, ',', '.') ?> <span
+                                class="text-xs font-normal opacity-50">₺</span></p>
+                    </div>
+                </div>
+
+                <!-- Monthly Average -->
+                <div class="glass-card p-4 rounded-xl flex items-center gap-3 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-3 -top-3 w-12 h-12 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all">
+                    </div>
+                    <div
+                        class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center border border-purple-500/20 shrink-0">
+                        <i class="fa-solid fa-coins text-purple-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-500 text-[9px] font-black uppercase tracking-wider">Aylık Ort.</h4>
+                        <p class="text-lg font-black text-white mt-0.5">
+                            <?= number_format($stats['avg_monthly_revenue'], 0, ',', '.') ?> <span
+                                class="text-xs font-normal opacity-50">₺</span></p>
+                    </div>
+                </div>
+
+                <!-- Monthly Renewal -->
+                <div class="glass-card p-4 rounded-xl flex items-center gap-3 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-3 -top-3 w-12 h-12 bg-orange-500/10 rounded-full blur-xl group-hover:bg-orange-500/20 transition-all">
+                    </div>
+                    <div
+                        class="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20 shrink-0">
+                        <i class="fa-solid fa-bell text-orange-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-500 text-[9px] font-black uppercase tracking-wider">
+                            <?= $extra_stats['display_month'] ?> Yenileme</h4>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <p class="text-lg font-black text-white"><?= $extra_stats['display_renewals'] ?></p>
+                            <span
+                                class="text-[9px] text-orange-400 font-bold"><?= number_format($extra_stats['display_revenue'], 0, ',', '.') ?>
+                                ₺</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers -->
+                <div class="glass-card p-4 rounded-xl flex items-center gap-3 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-3 -top-3 w-12 h-12 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all">
+                    </div>
+                    <div
+                        class="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center border border-indigo-500/20 shrink-0">
+                        <i class="fa-solid fa-users text-indigo-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-500 text-[9px] font-black uppercase tracking-wider">Müşteriler</h4>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <p class="text-lg font-black text-white"><?= $extra_stats['total_customers'] ?></p>
+                            <span class="text-[9px] text-indigo-400 font-bold">Kayıtlı</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -441,43 +583,70 @@ $extra_stats = [
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
-        Chart.defaults.font.family = "'Inter', sans-serif";
+        // Global Chart Defaults for Dark Theme
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.font.size = 11;
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 12;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: 'bold' };
 
         const monthlyData = <?= json_encode($monthly_analysis) ?>;
         const monthLabels = monthlyData.map(d => d.month);
 
-        // Aylık Yenilenecek Site Sayısı
+        // Grid Configuration
+        const commonScales = {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                ticks: { color: '#64748b' }
+            },
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: '#64748b' }
+            }
+        };
+
+        // 1. Aylık Yenileme Hacmi
         new Chart(document.getElementById('renewalsChart'), {
             type: 'bar',
             data: {
                 labels: monthLabels,
                 datasets: [{
-                    label: 'Yenilenecek',
+                    label: 'Yenilenecek Site',
                     data: monthlyData.map(d => d.renewals),
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                    borderColor: 'rgb(59, 130, 246)',
-                    borderWidth: 1
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: '#3b82f6'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                scales: commonScales
             }
         });
 
-        // Aylık Gelecek Gelir
+        // 2. Gelir Projeksiyonu
         new Chart(document.getElementById('revenueChart'), {
             type: 'line',
             data: {
                 labels: monthLabels,
                 datasets: [{
-                    label: 'Gelir (₺)',
+                    label: 'Beklenen Gelir (₺)',
                     data: monthlyData.map(d => d.revenue),
-                    borderColor: 'rgb(16, 185, 129)',
+                    borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: 'rgba(255,255,255,0.2)',
+                    pointBorderWidth: 4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                     tension: 0.4,
                     fill: true
                 }]
@@ -486,38 +655,105 @@ $extra_stats = [
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
+                scales: commonScales
             }
         });
 
+        // 3. Durum Dağılımı (Doughnut)
         const statusData = <?= json_encode(array_values($status_distribution)) ?>;
         new Chart(document.getElementById('statusChart'), {
             type: 'doughnut',
             data: {
                 labels: statusData.map(d => d.status.charAt(0).toUpperCase() + d.status.slice(1)),
-                datasets: [{ data: statusData.map(d => d.count), backgroundColor: ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6'] }]
+                datasets: [{
+                    data: statusData.map(d => d.count),
+                    backgroundColor: ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6'],
+                    borderWidth: 0,
+                    hoverOffset: 20
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 10, weight: 'bold' }
+                        }
+                    }
+                }
+            }
         });
 
+        // 4. Paket Dağılımı
         const packageData = <?= json_encode(array_values($package_distribution)) ?>;
         new Chart(document.getElementById('packageChart'), {
             type: 'bar',
             data: {
                 labels: packageData.map(d => d.package_type),
-                datasets: [{ label: 'Site', data: packageData.map(d => d.count), backgroundColor: ['rgba(99, 102, 241, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)'] }]
+                datasets: [{
+                    label: 'Segment',
+                    data: packageData.map(d => d.count),
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'],
+                    borderRadius: 10,
+                    barThickness: 24
+                }]
             },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: commonScales
+            }
         });
 
+        // 5. Site Yaşı (LTV)
         const ageData = <?= json_encode(array_values($age_distribution)) ?>;
         new Chart(document.getElementById('ageChart'), {
             type: 'polarArea',
             data: {
                 labels: ageData.map(d => d.age_range),
-                datasets: [{ data: ageData.map(d => d.count), backgroundColor: ['rgba(20, 184, 166, 0.6)', 'rgba(59, 130, 246, 0.6)', 'rgba(168, 85, 247, 0.6)', 'rgba(236, 72, 153, 0.6)', 'rgba(251, 146, 60, 0.6)'] }]
+                datasets: [{
+                    data: ageData.map(d => d.count),
+                    backgroundColor: [
+                        'rgba(20, 184, 166, 0.5)',
+                        'rgba(59, 130, 246, 0.5)',
+                        'rgba(168, 85, 247, 0.5)',
+                        'rgba(236, 72, 153, 0.5)',
+                        'rgba(251, 146, 60, 0.5)'
+                    ],
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 9 }
+                        }
+                    }
+                }
+            }
         });
     </script>
 </body>

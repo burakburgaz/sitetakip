@@ -7,19 +7,127 @@ $page_title = 'Takvim - DReklam';
 ?>
 <?php include 'includes/head.php'; ?>
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
 
-<body class='bg-gray-50 flex h-screen overflow-hidden'>
+<style>
+    /* FullCalendar Dark Theme Adjustments */
+    .fc {
+        --fc-border-color: rgba(255, 255, 255, 0.1);
+        --fc-daygrid-event-dot-width: 8px;
+        color: #f8fafc;
+    }
+
+    .fc .fc-toolbar-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem !important;
+    }
+
+    .fc .fc-button-primary {
+        background-color: var(--glass-bg) !important;
+        border: 1px solid var(--glass-border) !important;
+        color: #f8fafc !important;
+        text-transform: capitalize;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .fc .fc-button-primary:hover {
+        background-color: var(--glass-hover) !important;
+    }
+
+    .fc .fc-button-primary:not(:disabled).fc-button-active,
+    .fc .fc-button-primary:not(:disabled):active {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+    }
+
+    .fc-theme-standard td,
+    .fc-theme-standard th {
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .fc .fc-day-today {
+        background: rgba(59, 130, 246, 0.05) !important;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 1rem 0;
+    }
+
+    .fc-event {
+        border-radius: 6px !important;
+        padding: 2px 4px !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        border: none !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .fc-event:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .swal2-popup {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(20px) !important;
+    }
+</style>
+
+<body class="bg-gray-900 flex h-screen overflow-hidden">
+    <?php include 'includes/bg_blobs.php'; ?>
+
     <?php include 'includes/sidebar.php'; ?>
 
-    <div class='flex-1 flex flex-col h-screen overflow-hidden'>
-        <header class='bg-white shadow-sm z-10 p-4 border-b border-gray-200'>
-            <h2 class='text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2'>
-                <i class='fa-solid fa-calendar text-yellow-600'></i> Yenileme Takvimi
-            </h2>
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="z-10 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold logo-font text-white flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center border border-yellow-500/30">
+                            <i class="fa-solid fa-calendar text-yellow-400 text-xl"></i>
+                        </div>
+                        Yenileme Takvimi
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1 tracking-wider uppercase">Site Yenilemeleri ve Hatırlatmalar
+                    </p>
+                </div>
+            </div>
         </header>
 
-        <main class='flex-1 overflow-auto p-6'>
-            <div class='bg-white rounded-xl shadow-lg p-6 h-full'>
+        <main class="flex-1 overflow-auto p-8 pt-2">
+            <div class="glass-card rounded-[2.5rem] p-8 h-full shadow-2xl relative overflow-hidden">
                 <div id='calendar' class='h-full'></div>
             </div>
         </main>
@@ -33,27 +141,8 @@ $page_title = 'Takvim - DReklam';
         let calendar;
 
         $(document).ready(function () {
-            initSidebar();
             initCalendar();
         });
-
-        function initSidebar() {
-            $('#toggleSidebar').click(function () {
-                const sb = $('#sidebar');
-                const isExpanded = sb.hasClass('w-64');
-                const texts = $('.sidebar-text');
-                const icon = $(this).find('i');
-                if (isExpanded) {
-                    sb.removeClass('w-64').addClass('w-20');
-                    texts.addClass('hidden opacity-0');
-                    icon.removeClass('rotate-180');
-                } else {
-                    sb.removeClass('w-20').addClass('w-64');
-                    setTimeout(() => texts.removeClass('hidden opacity-0'), 150);
-                    icon.addClass('rotate-180');
-                }
-            });
-        }
 
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
@@ -76,8 +165,8 @@ $page_title = 'Takvim - DReklam';
                             return content.data.map(site => ({
                                 title: site.domain + ' (' + site.customer_name + ')',
                                 start: site.renewal_date,
-                                backgroundColor: site.status_color,
-                                borderColor: site.status_color,
+                                backgroundColor: site.status_color || '#3b82f6',
+                                borderColor: site.status_color || '#3b82f6',
                                 extendedProps: { ...site, type: 'site' }
                             }));
                         }
@@ -90,7 +179,7 @@ $page_title = 'Takvim - DReklam';
                             return content.data.map(reminder => ({
                                 title: '🔔 ' + reminder.title,
                                 start: reminder.reminder_date,
-                                backgroundColor: '#f59e0b', // Yellow/Orange
+                                backgroundColor: '#f59e0b',
                                 borderColor: '#d97706',
                                 extendedProps: { ...reminder, type: 'reminder' }
                             }));
@@ -99,20 +188,54 @@ $page_title = 'Takvim - DReklam';
                 ],
                 eventClick: function (info) {
                     const site = info.event.extendedProps;
-                    Swal.fire({
-                        title: site.domain,
-                        html:
-                            `<div class="text-left space-y-2">
-                                <p><strong>Müşteri:</strong> ${site.customer_name}</p>
-                                <p><strong>Yenileme Tarihi:</strong> ${formatDate(site.renewal_date)}</p>
-                                <p><strong>Kalan Gün:</strong> <span style="color: ${site.status_color}; font-weight: bold;">${site.days_until} gün</span></p>
-                                <p><strong>Paket:</strong> <span class="package-${site.package_type.toLowerCase()}">${site.package_type}</span></p>
-                                <p><strong>Fiyat:</strong> ${formatCurrency(site.price)}</p>
-                            </div>`
-                        ,
-                        icon: 'info',
-                        confirmButtonText: 'Tamam'
-                    });
+                    if (site.type === 'site') {
+                        Swal.fire({
+                            title: site.domain,
+                            html:
+                                `<div class="text-left space-y-3 p-2">
+                                    <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                        <p class="text-xs font-bold text-slate-500 uppercase mb-1">Müşteri</p>
+                                        <p class="text-white font-semibold">${site.customer_name}</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Yenileme Tarihi</p>
+                                            <p class="text-white font-semibold">${formatDate(site.renewal_date)}</p>
+                                        </div>
+                                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Kalan Gün</p>
+                                            <p class="font-black" style="color: ${site.status_color || '#3b82f6'}">${site.days_until} gün</p>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Paket</p>
+                                            <p class="text-white font-semibold">${site.package_type}</p>
+                                        </div>
+                                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Fiyat</p>
+                                            <p class="text-emerald-400 font-bold">${formatCurrency(site.price)}</p>
+                                        </div>
+                                    </div>
+                                </div>`
+                            ,
+                            showCancelButton: true,
+                            confirmButtonText: 'Siteye Git',
+                            cancelButtonText: 'Kapat',
+                            confirmButtonColor: '#3b82f6'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'sites.php?id=' + site.id;
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Hatırlatma',
+                            text: site.title + (site.description ? " - " + site.description : ""),
+                            icon: 'info',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
                 }
             });
 

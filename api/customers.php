@@ -225,15 +225,10 @@ try {
             json_response(['status' => 'error', 'message' => 'Müşteri seçilmedi'], 400);
         }
 
-        // Check for sites
+        // Unassign sites (set customer_id to 0)
         $placeholders = str_repeat('?,', count($ids) - 1) . '?';
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sites WHERE customer_id IN ($placeholders)");
+        $stmt = $pdo->prepare("UPDATE sites SET customer_id = 0 WHERE customer_id IN ($placeholders)");
         $stmt->execute($ids);
-        $site_count = $stmt->fetchColumn();
-
-        if ($site_count > 0) {
-            json_response(['status' => 'error', 'message' => "Seçili müşterilere ait $site_count site var. Önce siteleri silin."], 400);
-        }
 
         $stmt = $pdo->prepare("DELETE FROM customers WHERE id IN ($placeholders)");
         $stmt->execute($ids);
@@ -248,14 +243,9 @@ try {
     if ($action === 'delete') {
         $id = $_POST['id'] ?? 0;
 
-        // Önce müşteriye ait site var mı kontrol et
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sites WHERE customer_id = ?");
+        // Unassign sites (set customer_id to 0)
+        $stmt = $pdo->prepare("UPDATE sites SET customer_id = 0 WHERE customer_id = ?");
         $stmt->execute([$id]);
-        $site_count = $stmt->fetchColumn();
-
-        if ($site_count > 0) {
-            json_response(['status' => 'error', 'message' => "Bu müşteriye ait $site_count site var. Önce siteleri silin."], 400);
-        }
 
         $stmt = $pdo->prepare("SELECT full_name FROM customers WHERE id = ?");
         $stmt->execute([$id]);

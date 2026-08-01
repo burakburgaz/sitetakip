@@ -34,16 +34,32 @@ function initializePage() {
         }
     });
 
-    // Prevent default context menu on table rows
+    // Unified Menu Trigger (Click and Right Click)
+    $(document).on('click', '.site-row', function (e) {
+        // Don't trigger if clicking on specific interactive elements
+        if ($(e.target).closest('a, button, input, .site-checkbox, .actions-menu').length) return;
+
+        e.preventDefault();
+        const siteId = $(this).data('id');
+        const domain = $(this).find('a').first().text().trim();
+        const row = $(this);
+
+        showSiteMenu(e.pageX, e.pageY, siteId, domain, row);
+    });
+
     $(document).on('contextmenu', '.site-row', function (e) {
         e.preventDefault();
         const siteId = $(this).data('id');
-        showContextMenu(e.pageX, e.pageY, siteId);
+        const domain = $(this).find('a').first().text().trim();
+        const row = $(this);
+
+        showSiteMenu(e.pageX, e.pageY, siteId, domain, row);
         return false;
     });
 
     // Double click to edit
-    $(document).on('dblclick', '.site-row', function () {
+    $(document).on('dblclick', '.site-row', function (e) {
+        if ($(e.target).closest('a, button, input').length) return;
         const siteId = $(this).data('id');
         editSite(siteId);
     });
@@ -211,7 +227,7 @@ function renderSitesTable(sites) {
                 </td>
                 <td class="px-6 py-5 hidden md:table-cell">
                     <div class="flex flex-col">
-                        <span class="text-sm font-bold text-slate-300">${s.customer_name}</span>
+                        <span class="text-sm font-bold text-slate-300">${s.customer_name || '<span class="text-red-400 italic text-xs">Müşteri Yok</span>'}</span>
                         ${s.customer_phone ? `<span class="text-[10px] text-slate-500 font-medium">${s.customer_phone}</span>` : ''}
                     </div>
                 </td>
@@ -598,7 +614,44 @@ function bulkDelete() {
     });
 }
 
+function showSiteMenu(x, y, siteId, domain, row) {
+    contextMenuSiteId = siteId;
+    const menu = $('#contextMenu');
+
+    // Set Title
+    $('#contextMenuTitle').text(domain || 'İşlemler');
+
+    // Handle Delete Button Visibility based on status (like dashboard)
+    const statusText = row.find('[title]').last().attr('title'); // Extract from status badge
+    if (statusText === 'İptal' || statusText === 'Transfer' || currentFilter === 'cancelled' || currentFilter === 'transferred') {
+        $('#delete-context-btn').removeClass('hidden');
+    } else {
+        $('#delete-context-btn').addClass('hidden');
+    }
+
+    // Position Menu
+    menu.removeClass('hidden');
+
+    // Adjust position if it goes off screen
+    const menuWidth = menu.outerWidth();
+    const menuHeight = menu.outerHeight();
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
+
+    // Sola dayalı hizalama (Menu to the left of cursor)
+    let finalX = x - menuWidth;
+    let finalY = y;
+
+    // Ekran sınırları kontrolü
+    if (finalX < 10) finalX = x + 5; // Click near left edge -> show to the right
+    if (finalY + menuHeight > windowHeight) finalY = windowHeight - menuHeight - 10;
+    if (finalY < 0) finalY = 10;
+
+    menu.css({ top: finalY + 'px', left: finalX + 'px' });
+}
+
 function showContextMenu(x, y, siteId) {
+    // Fallback for older calls if any
     contextMenuSiteId = siteId;
     const menu = $('#contextMenu');
     menu.removeClass('hidden');
@@ -611,6 +664,9 @@ function contextMenuAction(action) {
     switch (action) {
         case 'edit':
             editSite(contextMenuSiteId);
+            break;
+        case 'renew':
+            renewSite(contextMenuSiteId);
             break;
         case 'status':
             changeStatus(contextMenuSiteId);
@@ -753,9 +809,9 @@ function sendWhatsApp(siteId) {
 
         $.get('api/customers.php', { action: 'get', id: site.customer_id }, function (custRes) {
             const customer = custRes.data;
-            let optionsHtml = '<option value="">Şablon Seçiniz...</option>';
+            let optionsHtml = '<option class="bg-slate-800 text-white" value="">Şablon Seçiniz...</option>';
             templates.filter(t => t.type === 'whatsapp').forEach(t => {
-                optionsHtml += `<option value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
+                optionsHtml += `<option class="bg-slate-800 text-white" value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
             });
 
             const sendButtonText = hasEvolution ? '<i class="fa-solid fa-paper-plane mr-2"></i>API ile Gönder' : '<i class="fa-brands fa-whatsapp mr-2"></i>WhatsApp Web';
@@ -776,7 +832,7 @@ function sendWhatsApp(siteId) {
                         </div>
                         <div>
                             <label class="block text-sm font-semibold mb-2">Mesaj Şablonu</label>
-                            <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-gray-50">${optionsHtml}</select>
+                            <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-slate-800 text-white border-white/10">${optionsHtml}</select>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold mb-2">Mesaj</label>
@@ -787,7 +843,7 @@ function sendWhatsApp(siteId) {
                         <div class="border-t pt-4 mt-2">
                              <label class="flex items-center space-x-2 cursor-pointer mb-2">
                                 <input type="checkbox" id="waScheduleToggle" class="form-checkbox h-4 w-4 text-green-600">
-                                <span class="text-sm font-bold text-gray-700">Zamanlı Gönderim (İleri Tarihli)</span>
+                                <span class="text-sm font-bold text-white">Zamanlı Gönderim (İleri Tarihli)</span>
                              </label>
                              <div id="waScheduleContainer" class="hidden pl-6">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Gönderim Tarihi ve Saati</label>
@@ -797,7 +853,7 @@ function sendWhatsApp(siteId) {
                         </div>
                         ` : ''}
 
-                        ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Not: Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : '<p class="text-xs text-green-600 bg-green-50 p-2 rounded mt-2">API ayarlı. Mesaj otomatik gönderilecek.</p>'}
+                        ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Not: Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : ''}
                     </div>
                 `,
                 width: '600px',
@@ -1280,36 +1336,61 @@ function renderChatModal(messages, jid) {
         // Convert fromMe to boolean (API might send 0/1 or true/false)
         const isMe = Boolean(msg.fromMe);
         const align = isMe ? 'self-end' : 'self-start';
-        const color = isMe ? 'bg-green-100 text-gray-800' : 'bg-white text-gray-800';
+        // Premium Dark
+        const color = isMe
+            ? 'bg-emerald-500/10 text-emerald-100 border border-emerald-500/20 rounded-tr-none'
+            : 'bg-white/5 text-slate-200 border border-white/10 rounded-tl-none';
+
         const time = new Date(msg.timestamp * 1000).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'numeric' });
 
         return `
-        <div class="${align} max-w-[80%] rounded-lg shadow-sm p-3 ${color}">
-            <p class="text-sm pb-1 break-words py-1">${icon}${msg.content}</p>
-            <p class="text-[10px] text-gray-400 text-right">${time}</p>
+        <div class="${align} max-w-[80%] rounded-2xl p-4 shadow-sm ${color} mb-3 backdrop-blur-sm transition-all hover:scale-[1.01]">
+            <p class="text-sm pb-1 break-words leading-relaxed">${icon}${msg.content}</p>
+            <p class="text-[10px] text-white/40 text-right mt-1 font-medium">${time}</p>
         </div>
         `;
     };
 
-    let containerHtml = `<div class="flex flex-col space-y-3 h-[400px] overflow-y-auto p-4 bg-gray-100 rounded-lg" id="chatContainer">`;
-    containerHtml += messages.length === 0
-        ? '<p class="text-center text-gray-500 mt-10">Mesaj geçmişi bulunamadı.</p>'
-        : messages.map(generateBubble).join('');
+    // Glass Container
+    let containerHtml = `<div class="flex flex-col h-[500px] overflow-y-auto p-6 bg-black/40 rounded-3xl border border-white/5 custom-scrollbar backdrop-blur-md" id="chatContainer">`;
+
+    if (messages.length === 0) {
+        containerHtml += `
+            <div class="flex flex-col items-center justify-center h-full text-slate-500 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                    <i class="fa-regular fa-comments text-3xl"></i>
+                </div>
+                <p class="font-medium text-sm">Mesaj geçmişi bulunamadı</p>
+            </div>`;
+    } else {
+        containerHtml += messages.map(generateBubble).join('');
+    }
     containerHtml += '</div>';
 
     containerHtml += `
-    <div class="mt-4 flex gap-2">
-        <input type="text" id="chatInput" class="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500" placeholder="Mesaj yazın...">
-        <button id="sendChatBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
-            <i class="fa-solid fa-paper-plane"></i>
+    <div class="mt-4 flex gap-3">
+        <input type="text" id="chatInput" 
+            class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 placeholder:text-slate-600 transition-all outline-none" 
+            placeholder="Mesajınızı yazın...">
+        <button id="sendChatBtn" 
+            class="w-14 h-14 btn-gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95 group">
+            <i class="fa-solid fa-paper-plane text-xl text-white group-hover:rotate-12 transition-transform"></i>
         </button>
     </div>
     `;
 
     Swal.fire({
-        title: `Sohbet: ${jid}`,
+        title: `<span class="text-white logo-font tracking-wide text-xl">Sohbet: <span class="text-slate-400 text-base font-normal ml-2 font-sans">${jid}</span></span>`,
         html: containerHtml,
-        width: '600px',
+        width: '700px',
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#fff',
+        customClass: {
+            popup: 'glass-card rounded-[2.5rem] border border-white/10 p-0 overflow-hidden',
+            htmlContainer: 'p-6 !mt-0',
+            title: '!p-6 !pb-0 !text-left border-b border-white/5',
+            actions: 'border-t border-white/5 !py-4'
+        },
         showConfirmButton: false,
         showCancelButton: true,
         cancelButtonText: 'Kapat',

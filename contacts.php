@@ -7,27 +7,36 @@ $page_title = 'WhatsApp Rehber - DReklam';
 include 'includes/head.php';
 ?>
 
-<body class="bg-gray-50 flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden">
+    <?php include 'includes/bg_blobs.php'; ?>
+
     <?php include 'includes/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
         <!-- Header -->
-        <header class="bg-white shadow-sm z-10 p-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-green-600"></i>
-                    WhatsApp Rehber
-                </h2>
-                <div class="flex gap-2">
+        <header class="z-20 p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-3xl font-black text-white logo-font tracking-tight flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center border border-emerald-500/30">
+                            <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                        </div>
+                        WhatsApp Rehber
+                    </h2>
+                    <p class="text-slate-400 mt-1 text-sm font-medium">Evolution API ile senkronize rehber yönetimi</p>
+                </div>
+                <div class="flex items-center gap-4">
                     <button onclick="syncChats()" id="syncBtn"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
-                        <i class="fa-solid fa-sync"></i>
-                        <span class="hidden sm:inline">Konuşmaları Getir (API)</span>
+                        class="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold border border-white/10 transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate mr-2"></i>
+                        <span>Konuşmaları Getir (API)</span>
                     </button>
                     <a href="api/whatsapp.php?action=export_excel" target="_blank"
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i>
-                        <span class="hidden sm:inline">Excel İndir</span>
+                        class="px-6 py-3 btn-gradient-primary rounded-2xl flex items-center gap-2"
+                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4) !important;">
+                        <i class="fa-solid fa-file-excel mr-2"></i>
+                        <span>Excel İndir</span>
                     </a>
                 </div>
             </div>
@@ -37,48 +46,55 @@ include 'includes/head.php';
         <main class="flex-1 overflow-auto p-4 sm:p-6">
 
             <!-- Filters & Actions -->
-            <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
-                <div class="flex items-center gap-2">
+            <div class="glass-card rounded-[2.5rem] p-6 mb-8 flex flex-wrap gap-6 items-center justify-between">
+                <div class="flex items-center gap-3 p-1.5 bg-white/5 rounded-[1.5rem] border border-white/5">
                     <button onclick="filterType('all')"
-                        class="filter-btn active px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Tümü</button>
+                        class="filter-btn active px-6 py-2.5 rounded-xl text-xs font-bold transition">Tümü</button>
                     <button onclick="filterType('individual')"
-                        class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Kişiler</button>
+                        class="filter-btn px-6 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">Kişiler</button>
                     <button onclick="filterType('group')"
-                        class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Gruplar</button>
+                        class="filter-btn px-6 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">Gruplar</button>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-4">
                     <button onclick="deleteSelected()"
-                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-xs font-semibold transition">
-                        <i class="fa-solid fa-trash mr-1"></i>Seçilenleri Sil
+                        class="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-2xl text-xs font-bold transition">
+                        <i class="fa-solid fa-trash mr-2"></i>Seçilenleri Sil
                     </button>
                     <button onclick="importSelected()"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-xs font-semibold transition">
-                        <i class="fa-solid fa-user-plus mr-1"></i>Seçilenleri Müşteri Yap
+                        class="px-6 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-2xl text-xs font-bold transition">
+                        <i class="fa-solid fa-user-plus mr-2"></i>Seçilenleri Müşteri Yap
                     </button>
                 </div>
             </div>
 
             <!-- Contacts Table -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="glass-card rounded-[2.5rem] overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-bold">
-                                <th class="p-4 w-10">
-                                    <input type="checkbox" id="selectAll"
-                                        class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <tr class="border-b border-white/5">
+                                <th class="p-6 w-16">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="selectAll"
+                                            class="w-5 h-5 bg-white/5 border border-white/10 rounded focus:ring-primary">
+                                    </div>
                                 </th>
-                                <th class="p-4">İsim / Grup İsmi</th>
-                                <th class="p-4">Numara / ID</th>
-                                <th class="p-4">Tür</th>
-                                <th class="p-4">Son İşlem</th>
-                                <th class="p-4 text-right">Durum</th>
+                                <th class="p-6 text-xs font-bold text-slate-500 uppercase tracking-widest">İsim / Grup
+                                    İsmi</th>
+                                <th class="p-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Numara / ID
+                                </th>
+                                <th class="p-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Tür</th>
+                                <th class="p-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Son İşlem
+                                </th>
+                                <th class="p-6 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                    Durum</th>
                             </tr>
                         </thead>
-                        <tbody id="contactsTableBody" class="divide-y divide-gray-100 text-sm">
+                        <tbody id="contactsTableBody" class="text-sm text-slate-300">
                             <tr>
-                                <td colspan="6" class="p-6 text-center text-gray-500">Yükleniyor...</td>
+                                <td colspan="6" class="p-20 text-center text-slate-500 italic">Veriler yükleniyor...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -128,8 +144,9 @@ include 'includes/head.php';
 
         function filterType(type) {
             currentFilter = type;
-            $('.filter-btn').removeClass('active bg-indigo-100 text-indigo-700').addClass('bg-gray-100 text-gray-600');
-            $(`.filter-btn:contains('${type === 'all' ? 'Tümü' : (type === 'individual' ? 'Kişiler' : 'Gruplar')}')`).removeClass('bg-gray-100 text-gray-600').addClass('active bg-indigo-100 text-indigo-700');
+            $('.filter-btn').removeClass('active text-white bg-primary').addClass('text-slate-400 hover:text-white');
+            const typeText = type === 'all' ? 'Tümü' : (type === 'individual' ? 'Kişiler' : 'Gruplar');
+            $(`.filter-btn:contains('${typeText}')`).addClass('active text-white bg-primary').removeClass('text-slate-400');
             loadContacts();
         }
 
@@ -146,48 +163,51 @@ include 'includes/head.php';
             tbody.empty();
 
             if (contacts.length === 0) {
-                tbody.html('<tr><td colspan="6" class="p-6 text-center text-gray-500">Kayıt bulunamadı. "Konuşmaları Getir" butonunu kullanın.</td></tr>');
+                tbody.html('<tr><td colspan="6" class="p-20 text-center text-slate-500 italic">Kayıt bulunamadı. "Konuşmaları Getir" butonunu kullanın.</td></tr>');
                 return;
             }
 
             contacts.forEach(c => {
                 const displayName = c.type === 'group' ? (c.group_name || c.name) : c.name;
-                const safeName = displayName.replace(/'/g, "\\'"); // Escape quotes
+                const safeName = displayName.replace(/'/g, "\\'");
                 const displayNumber = c.type === 'group' ? '-' : c.number;
+
                 const typeLabel = c.type === 'group' ?
-                    '<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-semibold">Grup</span>' :
-                    '<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold">Kişi</span>';
+                    '<span class="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-[10px] font-bold border border-purple-500/20 uppercase tracking-wider">Grup</span>' :
+                    '<span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-bold border border-blue-500/20 uppercase tracking-wider">Kişi</span>';
 
                 const importedBadge = c.is_imported ?
-                    '<span class="text-green-600 text-xs font-bold"><i class="fa-solid fa-check mr-1"></i>Ekli</span>' :
-                    '<span class="text-gray-400 text-xs">Değil</span>';
+                    '<span class="text-emerald-400 text-xs font-bold flex items-center gap-1 justify-end"><i class="fa-solid fa-check-circle"></i>Ekli</span>' :
+                    '<span class="text-slate-600 text-xs font-medium">Değil</span>';
 
-                // Unread message badge
                 const unreadBadge = (c.unread_count && c.unread_count > 0) ?
-                    `<span class="inline-flex items-center justify-center px-2 py-0.5 ml-2 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">${c.unread_count}</span>` :
+                    `<span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-black text-white bg-primary rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] animate-pulse">${c.unread_count}</span>` :
                     '';
 
                 const row = `
-                    <tr class="hover:bg-gray-50 transition group cursor-pointer" onclick="fetchChat('${c.jid}', '${safeName}')">
-                        <td class="p-4" onclick="event.stopPropagation()">
-                            <input type="checkbox" class="contact-check rounded text-indigo-600 focus:ring-indigo-500" value="${c.jid}">
+                    <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer border-b border-white/5" onclick="fetchChat('${c.jid}', '${safeName}')">
+                        <td class="p-6" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="contact-check w-5 h-5 bg-white/5 border border-white/10 rounded focus:ring-primary" value="${c.jid}">
                         </td>
-                        <td class="p-4 font-medium text-gray-800">
-                             <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold relative">
+                        <td class="p-6">
+                             <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-primary text-sm font-black relative group-hover:scale-110 transition-transform">
                                     ${displayName ? displayName.substring(0, 2).toUpperCase() : '?'}
-                                    ${unreadBadge ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>' : ''}
+                                    ${unreadBadge ? '<span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary rounded-full border-2 border-[#0f172a]"></span>' : ''}
                                 </div>
-                                <div class="flex items-center">
-                                    ${displayName || 'Bilinmiyor'}
-                                    ${unreadBadge}
+                                <div class="flex flex-col">
+                                    <span class="text-white font-bold group-hover:text-primary transition-colors flex items-center gap-2">
+                                        ${displayName || 'Bilinmiyor'}
+                                        ${unreadBadge}
+                                    </span>
+                                    <span class="text-slate-500 text-xs font-medium">WhatsApp Sohbet</span>
                                 </div>
                              </div>
                         </td>
-                        <td class="p-4 text-gray-600 font-mono text-xs">${displayNumber}</td>
-                        <td class="p-4">${typeLabel}</td>
-                        <td class="p-4 text-gray-500 text-xs">${c.last_message_time || '-'}</td>
-                        <td class="p-4 text-right">${importedBadge}</td>
+                        <td class="p-6 text-slate-400 font-mono text-xs">${displayNumber}</td>
+                        <td class="p-6">${typeLabel}</td>
+                        <td class="p-6 text-slate-400 text-xs font-medium">${c.last_message_time || '-'}</td>
+                        <td class="p-6 text-right">${importedBadge}</td>
                     </tr>
                 `;
                 tbody.append(row);
@@ -229,6 +249,8 @@ include 'includes/head.php';
         }
 
         function renderChatModal(messages, jid, name) {
+            if (chatPollInterval) clearInterval(chatPollInterval);
+
             const generateBubble = (msg) => {
                 let icon = '';
                 if (msg.type === 'image') icon = '<i class="fa-solid fa-image mr-1"></i>';
@@ -239,43 +261,64 @@ include 'includes/head.php';
 
                 const isMe = Boolean(msg.fromMe);
                 const align = isMe ? 'self-end' : 'self-start';
-                const color = isMe ? 'bg-green-100 text-gray-800' : 'bg-white text-gray-800';
+                // Premium Dark
+                const color = isMe 
+                    ? 'bg-emerald-500/10 text-emerald-100 border border-emerald-500/20 rounded-tr-none' 
+                    : 'bg-white/5 text-slate-200 border border-white/10 rounded-tl-none';
 
-                // Format timestamp
                 let time = '';
                 try {
                     time = new Date(msg.timestamp * 1000).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'numeric' });
                 } catch (e) { time = '-'; }
 
                 return `
-                <div class="${align} max-w-[80%] rounded-lg shadow-sm p-3 ${color} mb-2" data-id="${msg.id}">
-                    <p class="text-sm pb-1 break-words py-1">${icon}${msg.content}</p>
-                    <p class="text-[10px] text-gray-400 text-right">${time}</p>
+                <div class="${align} max-w-[80%] rounded-2xl p-4 shadow-sm ${color} mb-3 backdrop-blur-sm transition-all hover:scale-[1.01]">
+                    <p class="text-sm pb-1 break-words leading-relaxed">${icon}${msg.content}</p>
+                    <p class="text-[10px] text-white/40 text-right mt-1 font-medium">${time}</p>
                 </div>
                 `;
             };
 
+            // Glass Container
+            let containerHtml = `<div class="flex flex-col h-[500px] overflow-y-auto p-6 bg-black/40 rounded-3xl border border-white/5 custom-scrollbar backdrop-blur-md" id="chatContainer">`;
+
             const contentHtml = messages && messages.length > 0
                 ? messages.map(generateBubble).join('')
-                : '<div class="text-center text-gray-500 mt-10">Mesaj geçmişi bulunamadı.</div>';
+                : `
+                <div class="flex flex-col items-center justify-center h-full text-slate-500 opacity-60">
+                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                        <i class="fa-regular fa-comments text-3xl"></i>
+                    </div>
+                    <p class="font-medium text-sm">Mesaj geçmişi bulunamadı</p>
+                </div>`;
 
-            let containerHtml = `<div class="flex flex-col h-[400px] overflow-y-auto p-4 bg-gray-100 rounded-lg" id="chatContainer">`;
             containerHtml += contentHtml;
             containerHtml += '</div>';
 
             containerHtml += `
-            <div class="mt-4 flex gap-2">
-                <input type="text" id="chatInput" class="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500" placeholder="Mesaj yazın...">
-                <button id="sendChatBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
-                    <i class="fa-solid fa-paper-plane"></i>
+            <div class="mt-4 flex gap-3">
+                <input type="text" id="chatInput" 
+                    class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 placeholder:text-slate-600 transition-all outline-none" 
+                    placeholder="Mesajınızı yazın...">
+                <button id="sendChatBtn" 
+                    class="w-14 h-14 btn-gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95 group">
+                    <i class="fa-solid fa-paper-plane text-xl text-white group-hover:rotate-12 transition-transform"></i>
                 </button>
             </div>
             `;
 
             Swal.fire({
-                title: name || jid,
+                title: `<span class="text-white logo-font tracking-wide text-xl">${name || jid}</span>`,
                 html: containerHtml,
-                width: '600px',
+                width: '700px',
+                background: 'rgba(15, 23, 42, 0.95)',
+                color: '#fff',
+                customClass: {
+                    popup: 'glass-card rounded-[2.5rem] border border-white/10 p-0 overflow-hidden',
+                    htmlContainer: 'p-6 !mt-0',
+                    title: '!p-6 !pb-0 !text-left border-b border-white/5',
+                    actions: 'border-t border-white/5 !py-4'
+                },
                 showConfirmButton: false,
                 showCancelButton: true,
                 cancelButtonText: 'Kapat',
@@ -304,7 +347,10 @@ include 'includes/head.php';
                                 const isAtBottom = (maxScroll - currentScroll) < 50;
 
                                 // Update chat content
-                                const newContent = res.data.map(generateBubble).join('');
+                                const newContent = res.data.length === 0
+                                    ? '<p class="text-center text-gray-500 mt-10">Mesaj geçmişi bulunamadı.</p>'
+                                    : res.data.map(generateBubble).join('');
+
                                 $('#chatContainer').html(newContent);
 
                                 // Auto-scroll only if user was at bottom
@@ -362,32 +408,37 @@ include 'includes/head.php';
         function syncChats() {
             // Enhanced UI with real-time logging
             let stepsHtml = `
-                <div class="text-left text-sm space-y-3 p-2">
-                    <div id="step1" class="flex items-center gap-3 text-gray-500">
-                        <i class="fa-solid fa-circle-notch fa-spin step-icon"></i>
-                        <span>API ve Telefon Bağlantısı Kontrol Ediliyor...</span>
+                <div class="text-left space-y-4 p-4">
+                    <div id="step1" class="flex items-center gap-4 text-slate-500 p-4 bg-white/5 rounded-2xl border border-white/5 transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                            <i class="fa-solid fa-circle-notch fa-spin step-icon text-xl"></i>
+                        </div>
+                        <span class="font-bold">API ve Telefon Bağlantısı Kontrol Ediliyor...</span>
                     </div>
-                    <div id="step2" class="flex items-center gap-3 text-gray-400">
-                        <i class="fa-solid fa-circle step-icon text-gray-300"></i>
-                        <span>Sohbetler Evolution API'den Çekiliyor...</span>
+                    <div id="step2" class="flex items-center gap-4 text-slate-500 p-4 bg-white/5 rounded-2xl border border-white/5 transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                            <i class="fa-solid fa-circle step-icon text-gray-300 text-xl"></i>
+                        </div>
+                        <span class="font-bold">Sohbetler Evolution API'den Çekiliyor...</span>
                     </div>
-                    <div id="step3" class="flex items-center gap-3 text-gray-400">
-                        <i class="fa-solid fa-circle step-icon text-gray-300"></i>
-                        <span>Kişiler ve Numaralar Rehbere Kaydediliyor...</span>
+                    <div id="step3" class="flex items-center gap-4 text-slate-500 p-4 bg-white/5 rounded-2xl border border-white/5 transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                            <i class="fa-solid fa-circle step-icon text-gray-300 text-xl"></i>
+                        </div>
+                        <span class="font-bold">Kişiler ve Numaralar Rehbere Kaydediliyor...</span>
                     </div>
                     
                     <!-- Real-time Log Container -->
-                    <div class="mt-4 p-4 bg-gray-900 rounded-lg border border-gray-700 max-h-64 overflow-y-auto" 
-                         id="logContainer" style="display: none;">
-                        <div class="text-xs font-mono text-green-400 space-y-1" id="logContent"></div>
+                    <div class="mt-6 p-4 bg-black/60 rounded-2xl border border-white/5 max-h-48 overflow-y-auto custom-scrollbar" id="logContainer" style="display: none;">
+                        <div class="text-[10px] font-mono text-emerald-400 space-y-1.5" id="logContent"></div>
                     </div>
                     
                     <!-- Summary Box -->
-                    <div id="summaryBox" class="hidden mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                        <h4 class="font-bold text-green-800 mb-2 flex items-center gap-2">
+                    <div id="summaryBox" class="hidden mt-6 p-6 bg-emerald-500/10 rounded-[2rem] border border-emerald-500/20">
+                        <h4 class="font-black text-emerald-400 mb-4 flex items-center gap-2 uppercase tracking-widest text-xs">
                             <i class="fa-solid fa-check-circle"></i> İşlem Özeti
                         </h4>
-                        <div id="summaryContent" class="text-sm text-gray-700"></div>
+                        <div id="summaryContent" class="text-sm text-slate-300"></div>
                     </div>
                 </div>
             `;
@@ -411,17 +462,17 @@ include 'includes/head.php';
                 const span = el.find('span');
 
                 if (status === 'loading') {
-                    el.removeClass('text-gray-400 text-green-600 text-red-600').addClass('text-blue-600 font-medium');
-                    icon.attr('class', 'fa-solid fa-circle-notch fa-spin step-icon');
+                    el.removeClass('text-slate-500 text-emerald-400 text-rose-400 border-white/5 border-emerald-500/20 border-rose-500/20').addClass('text-blue-400 border-blue-500/20 font-bold');
+                    icon.attr('class', 'fa-solid fa-circle-notch fa-spin step-icon text-xl');
                 } else if (status === 'success') {
-                    el.removeClass('text-gray-400 text-blue-600 text-gray-500').addClass('text-green-600 font-bold');
-                    icon.attr('class', 'fa-solid fa-check-circle step-icon');
+                    el.removeClass('text-slate-500 text-blue-400 text-rose-400 border-white/5 border-blue-500/20 border-rose-500/20').addClass('text-emerald-400 border-emerald-500/20 font-bold');
+                    icon.attr('class', 'fa-solid fa-check-circle step-icon text-xl');
                 } else if (status === 'error') {
-                    el.removeClass('text-gray-400 text-blue-600').addClass('text-red-600 font-bold');
-                    icon.attr('class', 'fa-solid fa-times-circle step-icon');
+                    el.removeClass('text-slate-500 text-blue-400 text-emerald-400 border-white/5 border-blue-500/20 border-emerald-500/20').addClass('text-rose-400 border-rose-500/20 font-bold');
+                    icon.attr('class', 'fa-solid fa-times-circle step-icon text-xl');
                 } else { // pending
-                    el.removeClass('text-blue-600 text-green-600').addClass('text-gray-400');
-                    icon.attr('class', 'fa-solid fa-circle step-icon text-gray-300');
+                    el.removeClass('text-blue-400 text-emerald-400 text-rose-400 border-blue-500/20 border-emerald-500/20 border-rose-500/20').addClass('text-slate-500 border-white/5');
+                    icon.attr('class', 'fa-solid fa-circle step-icon text-gray-300 text-xl');
                 }
 
                 if (text) span.text(text);

@@ -217,11 +217,10 @@ $page_title = 'Siteler - DReklam';
         </main>
     </div>
 
-    <!-- Context Menu for Right Click -->
     <div id="contextMenu"
         class="hidden fixed glass-card rounded-2xl shadow-2xl border border-white/10 z-50 w-64 overflow-hidden py-1 backdrop-blur-2xl">
         <div class="px-4 py-3 border-b border-white/5 mb-1">
-            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">İşlemler</p>
+            <p id="contextMenuTitle" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">İşlemler</p>
         </div>
         <button onclick="contextMenuAction('edit')"
             class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
@@ -230,6 +229,14 @@ $page_title = 'Siteler - DReklam';
                 <i class="fa-solid fa-edit text-blue-400 text-sm"></i>
             </div>
             <span class="text-sm font-semibold">Düzenle</span>
+        </button>
+        <button onclick="contextMenuAction('renew')"
+            class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+            <div
+                class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+                <i class="fa-solid fa-sync text-emerald-400 text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold">Yenile (+1 Yıl)</span>
         </button>
         <button onclick="contextMenuAction('status')"
             class="w-full text-left px-4 py-3 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
@@ -272,7 +279,7 @@ $page_title = 'Siteler - DReklam';
             <span class="text-sm font-semibold">Mail Gönder</span>
         </button>
         <div class="my-1 border-t border-white/5"></div>
-        <button onclick="contextMenuAction('delete')"
+        <button onclick="contextMenuAction('delete')" id="delete-context-btn"
             class="w-full text-left px-4 py-3 hover:bg-red-500/10 flex items-center justify-start gap-3 text-red-400 transition-all group">
             <div
                 class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all">

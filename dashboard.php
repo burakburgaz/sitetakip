@@ -44,9 +44,7 @@ $stats['renewals_this_month'] = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT COUNT(*) FROM sites WHERE status = 'active' AND DATE(renewal_date) < DATE('now')");
 $stats['expired_sites'] = $stmt->fetchColumn();
 
-// Toplam gelir (aktif siteler)
-$stmt = $pdo->query("SELECT SUM(price) FROM sites WHERE status = 'active'");
-$stats['total_revenue'] = $stmt->fetchColumn() ?? 0;
+
 
 // Son eklenen siteler
 $recent_sites = $pdo->query("
@@ -90,82 +88,8 @@ $queue_history = $pdo->query("
 ?>
 <?php include 'includes/head.php'; ?>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
-    rel="stylesheet">
-
 <style>
-    :root {
-        --primary: #3b82f6;
-        --primary-dark: #2563eb;
-        --bg-dark: #0f172a;
-        --glass-bg: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-hover: rgba(255, 255, 255, 0.06);
-    }
-
-    body {
-        background-color: var(--bg-dark) !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-        color: #f8fafc;
-        overflow: hidden;
-    }
-
-    .bg-blobs {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        overflow: hidden;
-        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-    }
-
-    .blob {
-        position: absolute;
-        width: 600px;
-        height: 600px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-        filter: blur(80px);
-        border-radius: 50%;
-        animation: move 25s infinite alternate;
-    }
-
-    .blob-1 {
-        top: -100px;
-        left: -100px;
-        animation-delay: 0s;
-    }
-
-    .blob-2 {
-        bottom: -100px;
-        right: -200px;
-        animation-delay: -5s;
-        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-    }
-
-    .blob-3 {
-        top: 30%;
-        right: 10%;
-        animation-delay: -10s;
-        width: 400px;
-        height: 400px;
-        background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
-    }
-
-    @keyframes move {
-        from {
-            transform: translate(0, 0) rotate(0deg);
-        }
-
-        to {
-            transform: translate(100px, 100px) rotate(90deg);
-        }
-    }
-
+    /* Dashboard-specific overrides */
     #sidebar {
         background: rgba(15, 23, 42, 0.6) !important;
         backdrop-filter: blur(20px) !important;
@@ -183,24 +107,6 @@ $queue_history = $pdo->query("
         background: var(--glass-hover) !important;
     }
 
-    .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-    }
-
-    header {
-        background: rgba(15, 23, 42, 0.4) !important;
-        backdrop-filter: blur(10px) !important;
-        border-bottom: 1px solid var(--glass-border) !important;
-    }
-
-    .logo-font {
-        font-family: 'Outfit', sans-serif;
-    }
-
     .stat-card {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -209,24 +115,6 @@ $queue_history = $pdo->query("
         transform: translateY(-5px);
         background: var(--glass-hover);
         border-color: rgba(59, 130, 246, 0.3);
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.2);
     }
 
     .renewal-item,
@@ -266,14 +154,26 @@ $queue_history = $pdo->query("
     .reminder-item.bg-blue-50 {
         border-left: 4px solid #3b82f6 !important;
     }
-
-    </style>
+</style>
 
 <body class="bg-gray-900 flex h-screen overflow-hidden">
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Premium Context Menu -->
+    <div id="premiumContextMenu"
+        class="hidden fixed glass-card rounded-2xl shadow-2xl border border-white/10 z-[100] w-64 overflow-hidden py-1 backdrop-blur-2xl transition-all duration-200">
+        <div class="px-4 py-3 border-b border-white/5 mb-1 bg-white/[0.02]">
+            <p id="ctxTitle" class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">İşlemler
+            </p>
+            <p id="ctxSubtitle" class="text-[11px] font-bold text-slate-200 truncate"></p>
+        </div>
+        <div id="ctxItems" class="space-y-0.5" style="max-height: 400px; overflow-y: auto;">
+            <!-- Dynamic Actions -->
+        </div>
     </div>
 
     <?php include 'includes/sidebar.php'; ?>
@@ -308,68 +208,7 @@ $queue_history = $pdo->query("
         <!-- Main Content -->
         <main class="flex-1 overflow-auto p-8 pt-2">
 
-            <!-- Quick Stats Cards (New Premium Design) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-                <div class="glass-card stat-card p-6 rounded-[2rem]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20">
-                            <i class="fa-solid fa-globe text-blue-400"></i>
-                        </div>
-                        <span
-                            class="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Aktif</span>
-                    </div>
-                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Toplam Site</h4>
-                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['total_sites'] ?></p>
-                </div>
 
-                <div class="glass-card stat-card p-6 rounded-[2rem]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20">
-                            <i class="fa-solid fa-users text-purple-400"></i>
-                        </div>
-                    </div>
-                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Müşteriler</h4>
-                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['total_customers'] ?></p>
-                </div>
-
-                <div class="glass-card stat-card p-6 rounded-[2rem]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center border border-yellow-500/20">
-                            <i class="fa-solid fa-bolt text-yellow-400"></i>
-                        </div>
-                    </div>
-                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Bu Ay Yenileme</h4>
-                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['renewals_this_month'] ?></p>
-                </div>
-
-                <div class="glass-card stat-card p-6 rounded-[2rem]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/20">
-                            <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
-                        </div>
-                    </div>
-                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Süresi Dolan</h4>
-                    <p class="text-3xl font-bold text-white mt-1"><?= $stats['expired_sites'] ?></p>
-                </div>
-
-                <div class="glass-card stat-card p-6 rounded-[2rem]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
-                            <i class="fa-solid fa-lira-sign text-emerald-400"></i>
-                        </div>
-                    </div>
-                    <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Toplam Gelir</h4>
-                    <p class="text-3xl font-bold text-white mt-1">
-                        <?= number_format($stats['total_revenue'], 0, ',', '.') ?> <span
-                            class="text-lg font-normal opacity-50">₺</span>
-                    </p>
-                </div>
-            </div>
 
             <!-- İki Sütunlu Widget Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -399,83 +238,83 @@ $queue_history = $pdo->query("
                         </div>
                         <div class="space-y-3 relative z-10" id="renewalsWidget">
                             <?php if (empty($upcoming_renewals)): ?>
-                                    <div class="text-center py-10">
-                                        <div
-                                            class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                                            <i class="fa-solid fa-check text-slate-500 text-2xl"></i>
-                                        </div>
-                                        <p class="text-slate-500 text-sm italic">Yaklaşan yenileme bulunmuyor</p>
+                                <div class="text-center py-10">
+                                    <div
+                                        class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                        <i class="fa-solid fa-check text-slate-500 text-2xl"></i>
                                     </div>
+                                    <p class="text-slate-500 text-sm italic">Yaklaşan yenileme bulunmuyor</p>
+                                </div>
                             <?php else: ?>
-                                    <?php foreach ($upcoming_renewals as $site): ?>
-                                            <?php
-                                            $days = days_until_renewal($site['renewal_date']);
-                                            $status = get_renewal_status($days);
-                                            $urgency_class = $days <= 7 ? 'bg-red-50' : ($days <= 15 ? 'bg-yellow-50' : 'bg-green-50');
+                                <?php foreach ($upcoming_renewals as $site): ?>
+                                    <?php
+                                    $days = days_until_renewal($site['renewal_date']);
+                                    $status = get_renewal_status($days);
+                                    $urgency_class = $days <= 7 ? 'bg-red-50' : ($days <= 15 ? 'bg-yellow-50' : 'bg-green-50');
 
-                                            $status_badge = '';
-                                            if ($site['whatsapp_sent'] == 1) {
-                                                $wa_time = $site['whatsapp_sent_at'] ? date('d.m H:i', strtotime($site['whatsapp_sent_at'])) : '';
-                                                $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-500/30" title="Mesaj Gönderildi"><i class="fa-brands fa-whatsapp"></i> ' . $wa_time . '</span>';
-                                            } elseif ($site['status'] == 'requested')
-                                                $status_badge = '<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30"><i class="fa-solid fa-paper-plane mr-1 text-[8px]"></i>İstendi</span>';
-                                            elseif ($site['status'] == 'accepted')
-                                                $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30"><i class="fa-solid fa-check mr-1 text-[8px]"></i>Kabul</span>';
+                                    $status_badge = '';
+                                    if ($site['whatsapp_sent'] == 1) {
+                                        $wa_time = $site['whatsapp_sent_at'] ? date('d.m H:i', strtotime($site['whatsapp_sent_at'])) : '';
+                                        $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-500/30" title="Mesaj Gönderildi"><i class="fa-brands fa-whatsapp"></i> ' . $wa_time . '</span>';
+                                    } elseif ($site['status'] == 'requested')
+                                        $status_badge = '<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30"><i class="fa-solid fa-paper-plane mr-1 text-[8px]"></i>İstendi</span>';
+                                    elseif ($site['status'] == 'accepted')
+                                        $status_badge = '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30"><i class="fa-solid fa-check mr-1 text-[8px]"></i>Kabul</span>';
 
-                                            $api_date_display = '';
-                                            $accept_btn = '';
-                                            if (!empty($site['api_expires_at'])) {
-                                                if (strtotime($site['api_expires_at']) > strtotime($site['renewal_date'])) {
-                                                    $api_date_display = '<div class="text-[10px] text-blue-400/80 font-medium mt-1 inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-heart text-blue-500"></i> API: ' . format_date($site['api_expires_at']) . '</div>';
-                                                    $accept_btn = '<button onclick="event.stopPropagation(); acceptRenewal(' . $site['id'] . ')" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1 rounded-lg transition shadow-lg flex items-center gap-1.5 ml-auto" title="Yenilemeyi Onayla"><i class="fa-solid fa-check-circle"></i>Onayla</button>';
-                                                } else {
-                                                    $api_date_display = '<div class="text-[10px] text-slate-600 mt-1">API: ' . format_date($site['api_expires_at']) . '</div>';
-                                                }
-                                            }
-                                            ?>
-                                            <div class="renewal-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer group"
-                                                data-id="<?= $site['id'] ?>" data-domain="<?= htmlspecialchars($site['domain']) ?>"
-                                                data-customer="<?= htmlspecialchars($site['customer_name']) ?>"
-                                                data-phone="<?= htmlspecialchars($site['customer_phone']) ?>"
-                                                data-status="<?= $site['status'] ?>"
-                                                onclick="showRenewalMenu(event, <?= $site['id'] ?>); return false;"
-                                                oncontextmenu="showRenewalMenu(event, <?= $site['id'] ?>); return false;">
+                                    $api_date_display = '';
+                                    $accept_btn = '';
+                                    if (!empty($site['api_expires_at'])) {
+                                        if (strtotime($site['api_expires_at']) > strtotime($site['renewal_date'])) {
+                                            $api_date_display = '<div class="text-[10px] text-blue-400/80 font-medium mt-1 inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-heart text-blue-500"></i> API: ' . format_date($site['api_expires_at']) . '</div>';
+                                            $accept_btn = '<button onclick="event.stopPropagation(); acceptRenewal(' . $site['id'] . ')" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1 rounded-lg transition shadow-lg flex items-center gap-1.5 ml-auto" title="Yenilemeyi Onayla"><i class="fa-solid fa-check-circle"></i>Onayla</button>';
+                                        } else {
+                                            $api_date_display = '<div class="text-[10px] text-slate-600 mt-1">API: ' . format_date($site['api_expires_at']) . '</div>';
+                                        }
+                                    }
+                                    ?>
+                                    <div class="renewal-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer group"
+                                        data-id="<?= $site['id'] ?>" data-domain="<?= htmlspecialchars($site['domain']) ?>"
+                                        data-customer="<?= htmlspecialchars($site['customer_name']) ?>"
+                                        data-phone="<?= htmlspecialchars($site['customer_phone']) ?>"
+                                        data-status="<?= $site['status'] ?>"
+                                        onclick="showRenewalMenu(event, <?= $site['id'] ?>); return false;"
+                                        oncontextmenu="showRenewalMenu(event, <?= $site['id'] ?>); return false;">
 
-                                                <div class="flex items-center justify-between gap-4">
-                                                    <div class="flex-1 min-w-0">
-                                                        <div class="flex items-center gap-3 mb-1.5 flex-wrap">
-                                                            <p
-                                                                class="font-bold text-white text-base group-hover:text-blue-400 transition-colors">
-                                                                <?= htmlspecialchars($site['domain']) ?>
-                                                            </p>
-                                                            <?= $status_badge ?>
-                                                        </div>
-                                                        <div class="flex items-center gap-4 text-xs">
-                                                            <span class="text-slate-400 flex items-center gap-1.5"><i
-                                                                    class="fa-solid fa-user text-slate-500"></i><?= htmlspecialchars($site['customer_name']) ?></span>
-                                                            <span
-                                                                class="font-bold text-emerald-400 text-xs bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20"><?= number_format($site['price'], 0, ',', '.') ?>
-                                                                ₺</span>
-                                                        </div>
-                                                        <?= $api_date_display ?>
-                                                    </div>
-                                                    <div class="text-right shrink-0">
-                                                        <div class="flex flex-col items-end gap-1">
-                                                            <?php if ($accept_btn):
-                                                                echo $accept_btn;
-                                                            endif; ?>
-                                                            <p
-                                                                class="text-sm font-black <?= $days <= 7 ? 'text-red-400' : 'text-slate-200' ?> uppercase tracking-tighter">
-                                                                <?= $days ?> GÜN KALDI
-                                                            </p>
-                                                            <p class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
-                                                                <?= format_date($site['renewal_date']) ?>
-                                                            </p>
-                                                        </div>
-                                                    </div>
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-3 mb-1.5 flex-wrap">
+                                                    <p
+                                                        class="font-bold text-white text-base group-hover:text-blue-400 transition-colors">
+                                                        <?= htmlspecialchars($site['domain']) ?>
+                                                    </p>
+                                                    <?= $status_badge ?>
+                                                </div>
+                                                <div class="flex items-center gap-4 text-xs">
+                                                    <span class="text-slate-400 flex items-center gap-1.5"><i
+                                                            class="fa-solid fa-user text-slate-500"></i><?= htmlspecialchars($site['customer_name']) ?></span>
+                                                    <span
+                                                        class="font-bold text-emerald-400 text-xs bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20"><?= number_format($site['price'], 0, ',', '.') ?>
+                                                        ₺</span>
+                                                </div>
+                                                <?= $api_date_display ?>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <?php if ($accept_btn):
+                                                        echo $accept_btn;
+                                                    endif; ?>
+                                                    <p
+                                                        class="text-sm font-black <?= $days <= 7 ? 'text-red-400' : 'text-slate-200' ?> uppercase tracking-tighter">
+                                                        <?= $days ?> GÜN KALDI
+                                                    </p>
+                                                    <p class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
+                                                        <?= format_date($site['renewal_date']) ?>
+                                                    </p>
                                                 </div>
                                             </div>
-                                    <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -510,52 +349,52 @@ $queue_history = $pdo->query("
                             ")->fetchAll();
 
                             if (empty($reminders)): ?>
-                                    <div class="text-center py-10">
-                                        <div
-                                            class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                                            <i class="fa-solid fa-calendar-check text-slate-500 text-2xl"></i>
-                                        </div>
-                                        <p class="text-slate-500 text-sm italic">Bekleyen hatırlatmanız yok</p>
+                                <div class="text-center py-10">
+                                    <div
+                                        class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                        <i class="fa-solid fa-calendar-check text-slate-500 text-2xl"></i>
                                     </div>
+                                    <p class="text-slate-500 text-sm italic">Bekleyen hatırlatmanız yok</p>
+                                </div>
                             <?php else: ?>
-                                    <?php foreach ($reminders as $reminder): ?>
-                                            <?php
-                                            $days_left = days_until_renewal($reminder['reminder_date']);
-                                            $urgency_class = $days_left <= 3 ? 'bg-red-50' : ($days_left <= 7 ? 'bg-yellow-50' : 'bg-blue-50');
-                                            ?>
-                                            <div class="reminder-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer"
-                                                data-id="<?= $reminder['id'] ?>" onclick="showReminderDetail(<?= $reminder['id'] ?>)"
-                                                oncontextmenu="showReminderMenu(event, <?= $reminder['id'] ?>); return false;">
-                                                <div class="flex items-center justify-between gap-4">
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-bold text-slate-200 text-sm mb-1 truncate">
-                                                            <?= htmlspecialchars($reminder['title']) ?>
-                                                        </p>
-                                                        <?php if ($reminder['domain']): ?>
-                                                                <p
-                                                                    class="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest flex items-center gap-1.5">
-                                                                    <i class="fa-solid fa-link text-[8px]"></i>
-                                                                    <?= htmlspecialchars($reminder['domain']) ?>
-                                                                </p>
-                                                        <?php endif; ?>
-                                                        <?php if ($reminder['description']): ?>
-                                                                <p class="text-[11px] text-slate-500 mt-1 lines-1 italic">
-                                                                    "<?= htmlspecialchars($reminder['description']) ?>"
-                                                                </p>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                    <div class="text-right shrink-0">
-                                                        <p
-                                                            class="text-xs font-black <?= $days_left <= 3 ? 'text-red-400' : ($days_left <= 7 ? 'text-yellow-400' : 'text-blue-400') ?> uppercase">
-                                                            <?= $days_left ?> GÜN
-                                                        </p>
-                                                        <p class="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">
-                                                            <?= format_date($reminder['reminder_date']) ?>
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                <?php foreach ($reminders as $reminder): ?>
+                                    <?php
+                                    $days_left = days_until_renewal($reminder['reminder_date']);
+                                    $urgency_class = $days_left <= 3 ? 'bg-red-50' : ($days_left <= 7 ? 'bg-yellow-50' : 'bg-blue-50');
+                                    ?>
+                                    <div class="reminder-item <?= $urgency_class ?> p-4 rounded-2xl cursor-pointer"
+                                        data-id="<?= $reminder['id'] ?>" onclick="showReminderDetail(<?= $reminder['id'] ?>)"
+                                        oncontextmenu="showReminderMenu(event, <?= $reminder['id'] ?>); return false;">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-bold text-slate-200 text-sm mb-1 truncate">
+                                                    <?= htmlspecialchars($reminder['title']) ?>
+                                                </p>
+                                                <?php if ($reminder['domain']): ?>
+                                                    <p
+                                                        class="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest flex items-center gap-1.5">
+                                                        <i class="fa-solid fa-link text-[8px]"></i>
+                                                        <?= htmlspecialchars($reminder['domain']) ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                                <?php if ($reminder['description']): ?>
+                                                    <p class="text-[11px] text-slate-500 mt-1 lines-1 italic">
+                                                        "<?= htmlspecialchars($reminder['description']) ?>"
+                                                    </p>
+                                                <?php endif; ?>
                                             </div>
-                                    <?php endforeach; ?>
+                                            <div class="text-right shrink-0">
+                                                <p
+                                                    class="text-xs font-black <?= $days_left <= 3 ? 'text-red-400' : ($days_left <= 7 ? 'text-yellow-400' : 'text-blue-400') ?> uppercase">
+                                                    <?= $days_left ?> GÜN
+                                                </p>
+                                                <p class="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">
+                                                    <?= format_date($reminder['reminder_date']) ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -574,94 +413,136 @@ $queue_history = $pdo->query("
                         <div class="space-y-4">
                             <!-- Planlananlar -->
                             <?php if (!empty($scheduled_msgs)): ?>
+                                <div
+                                    class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1 flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div> Bekleyen
+                                    Planlar
+                                </div>
+                                <?php foreach ($scheduled_msgs as $msg): ?>
                                     <div
-                                        class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1 flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div> Bekleyen
-                                        Planlar
-                                    </div>
-                                    <?php foreach ($scheduled_msgs as $msg): ?>
+                                        class="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <div class="flex items-start gap-4">
                                             <div
-                                                class="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
-                                                <div class="flex items-start gap-4">
-                                                    <div
-                                                        class="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shrink-0">
-                                                        <i class="fa-regular fa-clock text-yellow-500 text-sm"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-xs text-slate-200 font-medium leading-relaxed italic">
-                                                            "<?= htmlspecialchars($msg['message']) ?>"
-                                                        </p>
-                                                        <div class="flex items-center gap-3 mt-3">
-                                                            <span
-                                                                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"><?= format_date($msg['scheduled_at'], 'H:i d.m.y') ?></span>
-                                                            <span class="w-1 h-1 rounded-full bg-slate-700"></span>
-                                                            <span
-                                                                class="text-[10px] font-bold text-blue-400 uppercase tracking-widest"><i
-                                                                    class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
-                                                        </div>
-                                                    </div>
+                                                class="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shrink-0">
+                                                <i class="fa-regular fa-clock text-yellow-500 text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs text-slate-200 font-medium leading-relaxed italic">
+                                                    "<?= htmlspecialchars($msg['message']) ?>"
+                                                </p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span
+                                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"><?= format_date($msg['scheduled_at'], 'H:i d.m.y') ?></span>
+                                                    <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                                                    <span
+                                                        class="text-[10px] font-bold text-blue-400 uppercase tracking-widest"><i
+                                                            class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
                                                 </div>
                                             </div>
-                                    <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
 
                             <!-- Gönderilenler / Geçmiş -->
                             <?php if (!empty($queue_history)): ?>
-                                    <?php if (!empty($scheduled_msgs))
-                                        echo '<div class="h-px bg-white/5 my-6"></div>'; ?>
-                                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Son
-                                        İşlemler</div>
-                                    <?php foreach ($queue_history as $msg): ?>
-                                            <?php
-                                            $statusClass = 'bg-white/5 border-white/5';
-                                            $icon = 'fa-check text-slate-500';
-                                            $iconColor = 'bg-slate-500/10 border-slate-500/20';
-                                            $statusText = $msg['status'];
+                                <?php if (!empty($scheduled_msgs))
+                                    echo '<div class="h-px bg-white/5 my-6"></div>'; ?>
+                                <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Son
+                                    İşlemler</div>
+                                <?php foreach ($queue_history as $msg): ?>
+                                    <?php
+                                    $statusClass = 'bg-white/5 border-white/5';
+                                    $icon = 'fa-check text-slate-500';
+                                    $iconColor = 'bg-slate-500/10 border-slate-500/20';
+                                    $statusText = $msg['status'];
 
-                                            if ($msg['status'] == 'sent') {
-                                                $icon = 'fa-check-double text-emerald-500';
-                                                $iconColor = 'bg-emerald-500/10 border-emerald-500/20';
-                                                $statusText = 'Başarılı';
-                                            } elseif ($msg['status'] == 'failed') {
-                                                $icon = 'fa-times text-red-500';
-                                                $iconColor = 'bg-red-500/10 border-red-500/20';
-                                                $statusText = 'Hata';
-                                            } elseif ($msg['status'] == 'cancelled') {
-                                                $icon = 'fa-ban text-orange-500';
-                                                $iconColor = 'bg-orange-500/10 border-orange-500/20';
-                                                $statusText = 'İptal';
-                                            }
-                                            ?>
-                                            <div
-                                                class="flex items-start gap-4 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition">
-                                                <div
-                                                    class="w-8 h-8 rounded-xl <?= $iconColor ?> border flex items-center justify-center shrink-0">
-                                                    <i class="fa-solid <?= $icon ?> text-sm"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-xs text-slate-400 font-medium leading-relaxed truncate">
-                                                        <?= htmlspecialchars($msg['message']) ?>
-                                                    </p>
-                                                    <div class="flex items-center gap-3 mt-2 flex-wrap">
-                                                        <span
-                                                            class="text-[10px] font-bold text-slate-600"><?= format_date($msg['scheduled_at'], 'H:i d.m') ?></span>
-                                                        <span class="text-[10px] text-slate-500 border-l border-white/10 pl-2 ml-2"><i
-                                                                class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
-                                                        <span
-                                                            class="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md <?= $msg['status'] == 'sent' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400' ?> ml-auto"><?= $statusText ?></span>
-                                                    </div>
-                                                </div>
+                                    if ($msg['status'] == 'sent') {
+                                        $icon = 'fa-check-double text-emerald-500';
+                                        $iconColor = 'bg-emerald-500/10 border-emerald-500/20';
+                                        $statusText = 'Başarılı';
+                                    } elseif ($msg['status'] == 'failed') {
+                                        $icon = 'fa-times text-red-500';
+                                        $iconColor = 'bg-red-500/10 border-red-500/20';
+                                        $statusText = 'Hata';
+                                    } elseif ($msg['status'] == 'cancelled') {
+                                        $icon = 'fa-ban text-orange-500';
+                                        $iconColor = 'bg-orange-500/10 border-orange-500/20';
+                                        $statusText = 'İptal';
+                                    }
+                                    ?>
+                                    <div
+                                        class="flex items-start gap-4 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition">
+                                        <div
+                                            class="w-8 h-8 rounded-xl <?= $iconColor ?> border flex items-center justify-center shrink-0">
+                                            <i class="fa-solid <?= $icon ?> text-sm"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs text-slate-400 font-medium leading-relaxed truncate">
+                                                <?= htmlspecialchars($msg['message']) ?>
+                                            </p>
+                                            <div class="flex items-center gap-3 mt-2 flex-wrap">
+                                                <span
+                                                    class="text-[10px] font-bold text-slate-600"><?= format_date($msg['scheduled_at'], 'H:i d.m') ?></span>
+                                                <span class="text-[10px] text-slate-500 border-l border-white/10 pl-2 ml-2"><i
+                                                        class="fa-solid fa-phone mr-1"></i><?= htmlspecialchars($msg['phone']) ?></span>
+                                                <span
+                                                    class="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md <?= $msg['status'] == 'sent' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400' ?> ml-auto"><?= $statusText ?></span>
                                             </div>
-                                    <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
 
                             <?php if (empty($queue_history) && empty($scheduled_msgs)): ?>
-                                    <div class="text-center py-6">
-                                        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Henüz mesaj
-                                            kaydı bulunmuyor</p>
-                                    </div>
+                                <div class="text-center py-6">
+                                    <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Henüz mesaj
+                                        kaydı bulunmuyor</p>
+                                </div>
                             <?php endif; ?>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Quick Stats Cards (New Compact Design) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pb-4">
+                <div class="glass-card stat-card p-4 rounded-xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-globe text-blue-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Toplam Site</h4>
+                        <p class="text-xl font-bold text-white mt-0.5"><?= $stats['total_sites'] ?></p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card p-4 rounded-xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center border border-purple-500/20 shrink-0">
+                        <i class="fa-solid fa-users text-purple-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Müşteriler</h4>
+                        <p class="text-xl font-bold text-white mt-0.5"><?= $stats['total_customers'] ?></p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card p-4 rounded-xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center border border-yellow-500/20 shrink-0">
+                        <i class="fa-solid fa-bolt text-yellow-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Bu Ay</h4>
+                        <p class="text-xl font-bold text-white mt-0.5"><?= $stats['renewals_this_month'] ?></p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card p-4 rounded-xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20 shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Süresi Dolan</h4>
+                        <p class="text-xl font-bold text-white mt-0.5"><?= $stats['expired_sites'] ?></p>
                     </div>
                 </div>
             </div>
@@ -707,9 +588,9 @@ $queue_history = $pdo->query("
 
                 $.get('api/customers.php', { action: 'get', id: site.customer_id }, function (custRes) {
                     const customer = custRes.data;
-                    let optionsHtml = '<option value="">Şablon Seçiniz...</option>';
+                    let optionsHtml = '<option class="bg-slate-800 text-white" value="">Şablon Seçiniz...</option>';
                     templates.filter(t => t.type === 'whatsapp').forEach(t => {
-                        optionsHtml += `<option value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
+                        optionsHtml += `<option class="bg-slate-800 text-white" value="${t.id}" data-message="${encodeURIComponent(t.message)}">${t.title}</option>`;
                     });
 
                     const sendButtonText = hasEvolution ? '<i class="fa-solid fa-paper-plane mr-2"></i>API ile Gönder' : '<i class="fa-brands fa-whatsapp mr-2"></i>WhatsApp Web';
@@ -730,7 +611,7 @@ $queue_history = $pdo->query("
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2">Mesaj Şablonu</label>
-                                    <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-gray-50">${optionsHtml}</select>
+                                    <select id="waTemplate" class="w-full border rounded px-3 py-2 bg-slate-800 text-white border-white/10">${optionsHtml}</select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2">Mesaj</label>
@@ -741,7 +622,7 @@ $queue_history = $pdo->query("
                                 <div class="border-t pt-4 mt-2">
                                      <label class="flex items-center space-x-2 cursor-pointer mb-2">
                                          <input type="checkbox" id="waScheduleToggle" class="form-checkbox h-4 w-4 text-green-600">
-                                         <span class="text-sm font-bold text-gray-700">Zamanlı Gönderim (İleri Tarihli)</span>
+                                         <span class="text-sm font-bold text-white">Zamanlı Gönderim (İleri Tarihli)</span>
                                       </label>
                                       <div id="waScheduleContainer" class="hidden pl-6">
                                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Gönderim Tarihi ve Saati</label>
@@ -751,7 +632,7 @@ $queue_history = $pdo->query("
                                 </div>
                                 ` : ''}
 
-                                ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Not: Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : '<p class="text-xs text-green-600 bg-green-50 p-2 rounded mt-2">API ayarlı. Mesaj otomatik gönderilecek.</p>'}
+                                ${!hasEvolution ? '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded mt-2">Not: Evolution API ayarlı değil. WhatsApp Web açılacak.</p>' : ''}
                             </div>
                         `,
                         width: '600px',
@@ -909,23 +790,23 @@ $queue_history = $pdo->query("
 
             // Auto Sync Trigger
             <?php if (isset($trigger_sync) && $trigger_sync): ?>
-                    $.post('api/hostinger.php', { action: 'sync' }, function (res) {
-                        console.log('Auto sync completed:', res.message);
-                        if (res.added && res.added.length > 0) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'info',
-                                title: 'Yeni siteler tespit edildi!',
-                                text: res.added.join(', '),
-                                timer: 5000
-                            });
-                            setTimeout(() => location.reload(), 2000);
-                        } else if (res.updated_count > 0) {
-                            // Reload to show new dates
-                            location.reload();
-                        }
-                    });
+                $.post('api/hostinger.php', { action: 'sync' }, function (res) {
+                    console.log('Auto sync completed:', res.message);
+                    if (res.added && res.added.length > 0) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'info',
+                            title: 'Yeni siteler tespit edildi!',
+                            text: res.added.join(', '),
+                            timer: 5000
+                        });
+                        setTimeout(() => location.reload(), 2000);
+                    } else if (res.updated_count > 0) {
+                        // Reload to show new dates
+                        location.reload();
+                    }
+                });
             <?php endif; ?>
         });
 
@@ -952,58 +833,122 @@ $queue_history = $pdo->query("
             });
         }
 
-        // Renewal Menu Functions
+        // Context Menu Handler
+        let currentCtxId = null;
+        let currentCtxType = null;
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#premiumContextMenu').length) {
+                $('#premiumContextMenu').addClass('hidden');
+            }
+        });
+
         function showRenewalMenu(event, siteId) {
             event.preventDefault();
             event.stopPropagation();
 
             const item = $(event.currentTarget);
             const domain = item.data('domain');
-            const status = item.data('status'); // Get status
+            const status = item.data('status');
 
-            let deleteBtn = '';
+            currentCtxId = siteId;
+            currentCtxType = 'site';
+
+            let itemsHtml = `
+                <button onclick="renewalAction(${siteId}, 'chat')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-all"><i class="fa-solid fa-comments text-indigo-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Sohbet Geçmişi</span>
+                </button>
+                <button onclick="renewalAction(${siteId}, 'whatsapp')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all"><i class="fa-brands fa-whatsapp text-emerald-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">WhatsApp Gönder</span>
+                </button>
+                <button onclick="renewalAction(${siteId}, 'edit')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-all"><i class="fa-solid fa-edit text-blue-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Düzenle</span>
+                </button>
+                <button onclick="renewalAction(${siteId}, 'renew')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all"><i class="fa-solid fa-sync text-emerald-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Yenile (+1 Yıl)</span>
+                </button>
+                <button onclick="renewalAction(${siteId}, 'status')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-all"><i class="fa-solid fa-exchange-alt text-purple-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Durum Değiştir</span>
+                </button>
+                <button onclick="renewalAction(${siteId}, 'reminder')" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-all"><i class="fa-solid fa-bell text-yellow-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Hatırlatma Ekle</span>
+                </button>
+            `;
+
             if (status === 'cancelled') {
-                deleteBtn = `
-                <hr class="my-1">
-                <button onclick="renewalAction(${siteId}, 'delete')" class="w-full px-4 py-3 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition font-semibold">
-                    <i class="fa-solid fa-trash mr-2"></i>Sil
-                </button>`;
+                itemsHtml += `
+                    <div class="my-1 border-t border-white/5"></div>
+                    <button onclick="renewalAction(${siteId}, 'delete')" class="w-full text-left px-4 py-2.5 hover:bg-red-500/10 flex items-center justify-start gap-3 text-red-400 transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all"><i class="fa-solid fa-trash text-red-500 text-xs text-center w-4"></i></div>
+                        <span class="text-xs font-bold">Kalıcı Olarak Sil</span>
+                    </button>
+                `;
             }
 
-            Swal.fire({
-                title: `${domain}`,
-                html: `
-                    <div class="space-y-2 p-2">
-                        <button onclick="renewalAction(${siteId}, 'chat')" class="w-full px-4 py-3 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-comments mr-2"></i>Sohbet Geçmişi
-                        </button>
-                        <button onclick="renewalAction(${siteId}, 'whatsapp')" class="w-full px-4 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition font-semibold">
-                            <i class="fa-brands fa-whatsapp mr-2"></i>WhatsApp Gönder
-                        </button>
-                        <button onclick="renewalAction(${siteId}, 'edit')" class="w-full px-4 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-edit mr-2"></i>Düzenle
-                        </button>
-                        <button onclick="renewalAction(${siteId}, 'renew')" class="w-full px-4 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-sync mr-2"></i>Yenile (+1 Yıl)
-                        </button>
-                        <button onclick="renewalAction(${siteId}, 'status')" class="w-full px-4 py-3 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-exchange-alt mr-2"></i>Durum Değiştir
-                        </button>
-                        <button onclick="renewalAction(${siteId}, 'reminder')" class="w-full px-4 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-bell mr-2"></i>Hatırlatma Ekle
-                        </button>
-                        ${deleteBtn}
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCancelButton: true,
-                cancelButtonText: 'Kapat',
-                width: '400px'
-            });
+            renderContextMenu(event.clientX, event.clientY, domain, itemsHtml);
+        }
+
+        // Reminder Menu Functions
+        function showReminderMenu(event, reminderId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const item = $(event.currentTarget);
+            const title = item.find('.font-bold').first().text().trim();
+
+            currentCtxId = reminderId;
+            currentCtxType = 'reminder';
+
+            let itemsHtml = `
+                <button onclick="snoozeReminder(${reminderId})" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-all"><i class="fa-solid fa-clock text-yellow-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Ertele / Düzenle</span>
+                </button>
+                <button onclick="completeReminder(${reminderId})" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all"><i class="fa-solid fa-check text-emerald-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Tamamlandı</span>
+                </button>
+                <button onclick="addReminderNote(${reminderId})" class="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center justify-start gap-3 text-slate-300 transition-all group">
+                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-all"><i class="fa-solid fa-note-sticky text-blue-400 text-xs text-center w-4"></i></div>
+                    <span class="text-xs font-semibold">Not Ekle</span>
+                </button>
+            `;
+
+            renderContextMenu(event.clientX, event.clientY, title, itemsHtml);
+        }
+
+        function renderContextMenu(x, y, title, itemsHtml) {
+            const menu = $('#premiumContextMenu');
+            $('#ctxSubtitle').text(title);
+            $('#ctxItems').html(itemsHtml);
+
+            menu.removeClass('hidden');
+
+            const menuWidth = menu.outerWidth();
+            const menuHeight = menu.outerHeight();
+            const windowWidth = $(window).width();
+            const windowHeight = $(window).height();
+
+            // Sola dayalı hizalama (Menu to the left of cursor)
+            let finalX = x - menuWidth;
+            let finalY = y;
+
+            // Ekran sınırları kontrolü
+            if (finalX < 10) finalX = x + 5; // Click near left edge -> show to the right
+            if (finalY + menuHeight > windowHeight) finalY = windowHeight - menuHeight - 10;
+            if (finalY < 0) finalY = 10;
+
+            menu.css({ top: finalY + 'px', left: finalX + 'px' });
         }
 
         function renewalAction(siteId, action) {
-            Swal.close();
+            $('#premiumContextMenu').addClass('hidden');
 
             if (action === 'chat') {
                 showChatHistory(siteId); // New
@@ -1248,31 +1193,8 @@ $queue_history = $pdo->query("
             }
         }
 
-        // Reminder Menu Functions
-        function showReminderMenu(event, reminderId) {
-            event.preventDefault();
+        // Complete already handled by snooze/complete/note
 
-            Swal.fire({
-                title: 'Hatırlatma İşlemleri',
-                html: `
-                    <div class="space-y-2 p-2">
-                        <button onclick="snoozeReminder(${reminderId})" class="w-full px-4 py-3 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-clock mr-2"></i>Ertele
-                        </button>
-                        <button onclick="completeReminder(${reminderId})" class="w-full px-4 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-check mr-2"></i>Tamamlandı
-                        </button>
-                        <button onclick="addReminderNote(${reminderId})" class="w-full px-4 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition font-semibold">
-                            <i class="fa-solid fa-note-sticky mr-2"></i>Not Ekle
-                        </button>
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCancelButton: true,
-                cancelButtonText: 'Kapat',
-                width: '400px'
-            });
-        }
 
         function snoozeReminder(id) {
             $.get('api/reminders.php', { action: 'get', id: id }, function (res) {
@@ -1466,33 +1388,46 @@ $queue_history = $pdo->query("
 
                 const isMe = Boolean(msg.fromMe);
                 const align = isMe ? 'self-end' : 'self-start';
-                const color = isMe ? 'bg-green-100 text-gray-800' : 'bg-white text-gray-800';
+                // Premium Design
+                const color = isMe
+                    ? 'bg-emerald-500/10 text-emerald-100 border border-emerald-500/20 rounded-tr-none'
+                    : 'bg-white/5 text-slate-200 border border-white/10 rounded-tl-none';
+
                 const time = new Date(msg.timestamp * 1000).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'numeric' });
 
                 return `
-                <div class="${align} max-w-[80%] rounded-lg shadow-sm p-3 ${color} mb-2" data-id="${msg.id}">
-                    <p class="text-sm pb-1 break-words py-1">${icon}${msg.content}</p>
-                    <p class="text-[10px] text-gray-400 text-right">${time}</p>
+                <div class="${align} max-w-[80%] rounded-2xl p-4 shadow-sm ${color} mb-3 backdrop-blur-sm transition-all hover:scale-[1.01]" data-id="${msg.id}">
+                    <p class="text-sm pb-1 break-words leading-relaxed">${icon}${msg.content}</p>
+                    <p class="text-[10px] text-white/40 text-right mt-1 font-medium">${time}</p>
                 </div>
                 `;
             };
 
             const generateContent = (msgs) => {
                 if (!msgs || msgs.length === 0) {
-                    return '<div class="text-center text-gray-500 mt-10" id="no-messages-placeholder">Mesaj geçmişi bulunamadı.</div>';
+                    return `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-500 opacity-60">
+                        <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                            <i class="fa-regular fa-comments text-3xl"></i>
+                        </div>
+                        <p class="font-medium text-sm">Mesaj geçmişi bulunamadı</p>
+                    </div>`;
                 }
                 return msgs.map(generateBubble).join('');
             };
 
-            let containerHtml = `<div class="flex flex-col h-[400px] overflow-y-auto p-4 bg-gray-100 rounded-lg" id="chatContainer">`;
+            let containerHtml = `<div class="flex flex-col h-[500px] overflow-y-auto p-6 bg-black/40 rounded-3xl border border-white/5 custom-scrollbar backdrop-blur-md" id="chatContainer">`;
             containerHtml += generateContent(initialMessages);
             containerHtml += '</div>';
 
             containerHtml += `
-            <div class="mt-4 flex gap-2">
-                <input type="text" id="chatInput" class="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500" placeholder="Mesaj yazın...">
-                <button id="sendChatBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
-                    <i class="fa-solid fa-paper-plane"></i>
+            <div class="mt-4 flex gap-3">
+                <input type="text" id="chatInput" 
+                    class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 placeholder:text-slate-600 transition-all outline-none" 
+                    placeholder="Mesajınızı yazın...">
+                <button id="sendChatBtn" 
+                    class="w-14 h-14 btn-gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95 group">
+                    <i class="fa-solid fa-paper-plane text-xl text-white group-hover:rotate-12 transition-transform"></i>
                 </button>
             </div>
             `;
@@ -1500,9 +1435,17 @@ $queue_history = $pdo->query("
             let isPolling = false;
 
             Swal.fire({
-                title: `Sohbet: ${jid}`,
+                title: `<span class="text-white logo-font tracking-wide text-xl">Sohbet: <span class="text-slate-400 text-base font-normal ml-2 font-sans">${jid}</span></span>`,
                 html: containerHtml,
-                width: '600px',
+                width: '700px',
+                background: 'rgba(15, 23, 42, 0.95)',
+                color: '#fff',
+                customClass: {
+                    popup: 'glass-card rounded-[2.5rem] border border-white/10 p-0 overflow-hidden',
+                    htmlContainer: 'p-6 !mt-0',
+                    title: '!p-6 !pb-0 !text-left border-b border-white/5',
+                    actions: 'border-t border-white/5 !py-4'
+                },
                 showConfirmButton: false,
                 showCancelButton: true,
                 cancelButtonText: 'Kapat',

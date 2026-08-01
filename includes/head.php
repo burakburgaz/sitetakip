@@ -16,7 +16,8 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
 
     <!-- Custom CSS -->
-    <link rel='stylesheet' href='assets/css/custom.css'>
+    <link href="assets/css/custom.css" rel="stylesheet">
+    <link href="assets/css/modern.css" rel="stylesheet">
     <link rel='stylesheet' href='assets/css/opera-fix.css'>
 
 

@@ -1,0 +1,10 @@
+<?php
+/**
+ * Common background blobs for modern dark glassmorphic design.
+ */
+?>
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>

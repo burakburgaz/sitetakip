@@ -23,9 +23,15 @@
                 <i class="fa-brands fa-whatsapp text-2xl"></i>
                 <span class="font-bold text-lg">WhatsApp Mesajlar</span>
             </div>
-            <button onclick="toggleWhatsAppWidget()" class="text-white hover:text-gray-200 transition">
-                <i class="fa-solid fa-times text-xl"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="loadUnreadChats(true)"
+                    class="w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
+                    <i class="fa-solid fa-sync text-[10px] text-slate-400"></i>
+                </button>
+                <button onclick="toggleWhatsAppWidget()" class="text-white hover:text-gray-200 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Chats List -->
@@ -118,8 +124,12 @@
                 // Initial load
                 loadUnreadChats();
 
-                // Aggressive polling: 2.5 seconds
-                waWidgetInterval = setInterval(loadUnreadChats, 2500);
+                // Aggressive polling: 1 second
+                waWidgetInterval = setInterval(function () {
+                    const isVisible = !$('#waChatsPopup').hasClass('hidden');
+                    // If visible, check all (limit 100, full sync). If hidden, just poll 15.
+                    loadUnreadChats(isVisible);
+                }, 1000);
 
                 $(document).on('click', function (e) {
                     if (!$(e.target).closest('#whatsappFloatingWidget').length) {
@@ -132,15 +142,21 @@
                 const popup = jQuery('#waChatsPopup');
                 if (popup.hasClass('hidden')) {
                     popup.removeClass('hidden');
-                    loadUnreadChats();
+                    loadUnreadChats(true); // Force full check when opening
                 } else {
                     popup.addClass('hidden');
                 }
             };
 
-            function loadUnreadChats() {
+            function loadUnreadChats(checkAll = false) {
                 // Direct AJAX call without waiting for another ready event
-                jQuery.get('api/whatsapp.php', { action: 'get_unread_chats' })
+                const data = { action: 'get_unread_chats' };
+                // If checking all, we want to force the API to give us latest status for top 100
+                if (checkAll) {
+                    data.check_all = 1;
+                }
+
+                jQuery.get('api/whatsapp.php', data)
                     .done(function (res) {
                         if (res.status === 'success') {
                             updateBadge(res.total_unread);

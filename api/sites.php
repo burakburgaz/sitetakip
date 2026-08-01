@@ -17,7 +17,7 @@ try {
     if ($action === 'list') {
         $filter = $_GET['filter'] ?? 'all';
         $search = $_GET['search'] ?? '';
-        $sql = "SELECT s.*, c.full_name as customer_name, c.phone as customer_phone, c.email as customer_email FROM sites s JOIN customers c ON s.customer_id = c.id WHERE 1=1";
+        $sql = "SELECT s.*, c.full_name as customer_name, c.phone as customer_phone, c.email as customer_email FROM sites s LEFT JOIN customers c ON s.customer_id = c.id WHERE 1=1";
         $params = [];
         if ($filter === 'active') {
             // User requested: "iptal - transfer dışında kalan durumlar aktif... gözükmeye devam edilmeli"
